@@ -1,0 +1,333 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-2">
+    <h4>Módulo Usuario<span style="font-size:12px;color:#808080"> Dirección Departamental de Educación</span></h4>
+    <div class="card mb-3 m-1">             
+        <div class="col-sm" >   
+            <div style="height:550px">
+                <h4 class="form-section"><i class="fa fa-users"></i> Lista Usuarios</h4>
+                <div class="row" style="margin-bottom:5px">
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="row">
+                            <div class="col-lg-10 col-md-10 col-sm-10">
+                                <div class="input-group" style="margin-bottom:5px">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa fa-search" aria-hidden="true"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="TxtUsuarioParametro" placeholder="Buscar ..." aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2">
+                                <button type="button" onclick='ListarUsuarios(1,1)' style="margin-right:3px" class="btn mb-1 btn-block btn-outline-primary"><i class="fa fa-search"></i> </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2">
+                        <div class="modal-footer" style="margin:0px 0 0 0;padding:0 0 0 0;border-top:none">
+                            <button type="button" onclick="Usuarios()" class="btn btn-outline-dark btn-block"><i class="fa fa-print"></i><span style="margin-left:5px">Reporte</span> </button>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2">
+                        <div class="modal-footer" style="margin:0px 0 0 0;padding:0 0 0 0;border-top:none">
+                            <button type="button" onclick="Nuevo()" class="btn btn-outline-primary btn-block"><i class="fa fa-plus"></i><span style="margin-left:5px">Nuevo Registro</span> </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="containerCustom table-responsive">
+                    <table class='table table-hover table-sm' style='font-size:12px;'>
+                        <thead>
+                            <tr style="background-color:#17a2b8;border-color:#17a2b8;color:white">
+                                <th width='1px'>Código</th>
+                                <th>Nombre</th>
+                                <th>Cargo</th>
+                                <th>Unidad</th>
+                                <th>Rol</th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                            </tr>
+                        </thead>
+                        <tbody id="UsuarioTableHtml"></tbody>
+                    </table>
+                </div>
+                <div class="text-center">
+                    <ul class='pagination justify-content-end' id="PageUsuario"></ul>
+                </div>
+            </div>          
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-user"></i> Usuario</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <input type="hidden" id="Id" value="0" />
+                        <label>Ci</label>
+                        <input type="number" disabled class="form-control" placeholder="Ci" id="Ci" />
+                        <label>Nombres</label>
+                        <input type="text" disabled class="form-control" placeholder="Nombres" id="Nombres" />
+                        <label>Apellido Paterno</label>
+                        <input type="text" disabled class="form-control" placeholder="Apellido Paterno" id="Apaterno" />
+                        <label>Apellido Materno</label>
+                        <input type="text" disabled class="form-control" placeholder="Apellido Materno" id="Amaterno" />
+                        <label>Usuario</label>
+                        <input type="text" disabled class="form-control" placeholder="Usuario" id="Login" />
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <label>Cargo</label>
+                        <input type="text" disabled class="form-control" placeholder="Cargo" id="Cargo" />
+                        <label>Unidad</label>
+                        <select id="IdUnidad" disabled class="form-control">
+                        </select>
+                        <label>Direccion</label>
+                        <input type="text" disabled class="form-control" placeholder="Direccion" id="Direccion" />
+                        <label>Sexo</label>
+                        <select id="Sexo" disabled class="form-control">
+                            <option value="M">Masculino</option>
+                            <option value="F">Femenino</option>
+                        </select>
+                        <label>Contraseña</label>
+                        <input type="password" disabled class="form-control" placeholder="Contraseña" id="Contraseña" />
+                        <div id="ActivatePassword" style="display:none">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" onclick="ActiPassword()" class="custom-control-input" id="ActivarPassword">
+                                <label class="custom-control-label" for="ActivarPassword">Password</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>                                
+                <label class="text-center" style="margin:5px 0 0 0">Permisos Perfile</label>
+                <text class="form-control" style="height:auto" id="RolExtra">
+                    <div style='width:100%;padding:2px 0 2px 0'>
+                        <h6 class='text-muted text-center'>Seleccione el Perfil</h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" disabled name="NameRol" id="Check_Rol_1" value="1">
+                                    <label class="form-check-label" for="Check_Rol_1">
+                                        1.- Administrador Almacen
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" disabled name="NameRol" id="Check_Rol_2" value="2">
+                                    <label class="form-check-label" for="Check_Rol_2">
+                                        2.- Administrador Ventas
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" disabled name="NameRol" id="Check_Rol_3" value="3">
+                                    <label class="form-check-label" for="Check_Rol_3">
+                                        3.- Supervisor
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" disabled name="NameRol" id="Check_Rol_4" value="4">
+                                    <label class="form-check-label" for="Check_Rol_4">
+                                        4.- Funcionario
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </text>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Cancelar()">Cancelar</button>
+                <button type="button" disabled id="BtnGuardar" onclick="Guardar()" class="btn btn-success">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        ListarUnidad();
+        ListarUsuarios(1, 1);
+        function ListarUsuarios(pageIndex, is) {
+            $.getJSON('@Url.Action("All", "Usuario")', { SearchValue: $('#TxtUsuarioParametro').val(), PageIndex: pageIndex }, function (O) {
+                console.log(O.Lst);
+                var html = "";
+                $('#UsuarioTableHtml').empty();
+                O.Lst.forEach((value, i) => {
+                    html += "<tr><td>" + (i + 1) + "</td><td>" + value.Nombres + " " + value.Apaterno + " " + value.Amaterno + "</td><td>" + value.Cargo + "</td><td>" + value.NombreUnidad + "</td><td>" + value.NombreRol + "</td><td><button class='btn btn-outline-info btn-sm' onclick='ViewUsuario(" + value.Id + ",\"" + value.Ci + "\",\"" + value.Nombres + "\",\"" + value.Apaterno + "\",\"" + value.Amaterno + "\",\"" + value.Sexo + "\",\"" + value.Cargo + "\"," + value.IdUnidad + ",\"" + value.Login + "\"," + value.IdRol + ",\"" + value.Direccion + "\",false)'><i class='fa fa-eye'></i></button></td><td><button class='btn btn-outline-secondary btn-sm' onclick='ViewUsuario(" + value.Id + ", \"" + value.Ci + "\",\"" + value.Nombres + "\",\"" + value.Apaterno + "\",\"" + value.Amaterno + "\",\"" + value.Sexo + "\",\"" + value.Cargo + "\"," + value.IdUnidad + ",\"" + value.Login + "\"," + value.IdRol + ",\"" + value.Direccion + "\",true)'><i class='fa fa-pen'></i></button></td><td><button class='btn btn-outline-danger btn-sm' onclick='Eliminar(" + value.Id + ")'><i class='fa fa-trash'></i></button></td></tr>";
+                });
+                $('#UsuarioTableHtml').append(html);
+                var TotalPages = parseInt(O.TotalPages);
+                var rangeMin = 4;
+                var rangeMax = parseInt(TotalPages) == 1 ? 1 : rangeMin && parseInt(TotalPages) < rangeMin ? parseInt(TotalPages) : rangeMin;
+
+                const paging = { range: rangeMax, pages: TotalPages };
+                var PageArray = doPaging(pageIndex, paging);
+                var sTatusPrev = (pageIndex <= 1) ? true : false;
+                var sTatuslast = (pageIndex >= paging.pages) ? true : false;
+                var html = "<li class='page-item first " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarUsuarios(1, " + TotalPages + ")'>First</a></li><li class='page-item prev  " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarUsuarios(" + parseInt(pageIndex - 1) + ", " + TotalPages + ")'>Prev</a></li>";
+                PageArray.forEach((value, i) => {
+                    html += value.Status
+                        ?
+                        "<li class='page-item active'><a class='page-link' href='#' onclick='ListarUsuarios(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>"
+                        :
+                        "<li class='page-item'><a class='page-link' href='#' onclick='ListarUsuarios(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>";
+                });
+                html += "<li class='page-item next " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarUsuarios(" + parseInt(pageIndex + 1) + ", " + TotalPages + ")'>Next</a></li><li class='page-item last " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarUsuarios(" + paging.pages + ", " + TotalPages + ")'>Last</a></li>";
+                $('#PageUsuario').html(html);
+            });
+        }
+
+        function ViewUsuario(IdUsuario, Ci, Nombres, Apaterno, Amaterno, Sexo, Cargo, IdUnidad, Login, IdRol, Direccion, _EstadoModificar) {
+            $('#exampleModal').modal('show');
+            $('input[name *= NameRol]').prop('checked', false);
+                $("#Id").val(IdUsuario);
+                $("#Ci").val(Ci);
+                $("#Nombres").val(Nombres);
+                $("#Apaterno").val(Apaterno);
+                $("#Amaterno").val(Amaterno);
+                $("#Sexo").val(Sexo);
+                $("#Cargo").val(Cargo);
+                $("#IdUnidad").val(IdUnidad);
+                $("#Login").val(Login);
+                $("#Direccion").val(Direccion);
+                EstadoModificar = _EstadoModificar;
+                disabledHtml();
+                $("#Contraseña").prop("disabled", true);
+                $("#Contraseña").val("*******");
+                if (_EstadoModificar) {
+                    $('#ActivatePassword').show();
+                } else {
+                    $('#ActivatePassword').hide();
+                    $("#Contraseña").prop("checked", false);
+                    $('#ActivarPassword').prop("checked", false);
+                }
+            //ActiPassword();
+            $('#Check_Rol_' + IdRol).prop("checked", true);
+        }
+        function ListarUnidad() {
+            $.getJSON('@Url.Action("All", "Unidad")', null, function (O) {
+                var html = "";
+                $('#IdUnidad').empty();
+                $('#IdUnidad').append("");
+                O.forEach((value, i) => {
+                    html += "<option value='" + value.Id + "'>" + value.Nombre + "</option>";
+                });
+                $('#IdUnidad').append(html);
+            });
+        }
+         function ActiPassword() {
+            $("#Contraseña").prop("disabled", !JSON.parse($('#ActivarPassword').is(':checked')));
+            $('#ActivarPassword').is(':checked') ? $("#Contraseña").val("") : $("#Contraseña").val("******");
+        }
+        function Nuevo() {
+            $('#exampleModal').modal('show');
+            EstadoModificar = true;
+            disabledHtml();
+            LimpiarDatos();
+        }
+        function Cancelar() {
+            EstadoModificar = false;
+            disabledHtml();
+            LimpiarDatos();
+        }
+        function disabledHtml() {
+            $("#Ci").prop("disabled", !EstadoModificar);
+            $("#Nombres").prop("disabled", !EstadoModificar);
+            $("#Apaterno").prop("disabled", !EstadoModificar);
+            $("#Amaterno").prop("disabled", !EstadoModificar);
+            $("#Sexo").prop("disabled", !EstadoModificar);
+
+            $("#Cargo").prop("disabled", !EstadoModificar);
+            $("#IdUnidad").prop("disabled", !EstadoModificar);
+            $("#Login").prop("disabled", !EstadoModificar);
+            $("#Contraseña").prop("disabled", !EstadoModificar);
+            $("#Direccion").prop("disabled", !EstadoModificar);
+            $("#ActivarPassword").prop("disabled", !EstadoModificar);
+            $("#Check_Rol_1").prop("disabled", !EstadoModificar);
+            $("#Check_Rol_2").prop("disabled", !EstadoModificar);
+            $("#Check_Rol_3").prop("disabled", !EstadoModificar);
+            $("#Check_Rol_4").prop("disabled", !EstadoModificar);
+            $("#BtnGuardar").prop("disabled", !EstadoModificar);
+        }
+        function LimpiarDatos() {
+            $("#Id").val(0);
+            $("#Ci").val("");
+            $("#Nombres").val("");
+            $("#Apaterno").val("");
+            $("#Amaterno").val("");
+            $("#Sexo").val("M");
+
+            $("#Cargo").val("");
+            $("#IdUnidad").val(0);
+            $("#Login").val("");
+            $("#Contraseña").val("");
+            $("#Direccion").val("");
+            $('input[name *= NameRol]').prop('checked', false);
+        }
+        function Eliminar(Id) {
+            $.getJSON('@Url.Action("Eliminar", "Usuario")', {Id}, function (O) {
+                if (O.responce) {
+                    ListarUsuarios(1, 1);
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+        function Guardar() {
+            var IdRol = 0;
+            if ($('input[name="NameRol"]').is(':checked')) {
+                $("input[name=NameRol]:checked").each(function () {
+                    IdRol = $(this).val();
+                    console.log($(this).val())
+                });
+            } else {
+                toastr.warning('Debe seleccinar un Rol');
+            }
+            const Obj = {
+                Id: $("#Id").val(),
+                Ci: $("#Ci").val(),
+                Nombres: $("#Nombres").val(),
+                Apaterno: $("#Apaterno").val(),
+                Amaterno: $("#Amaterno").val(),
+                Sexo: $("#Sexo").val(),
+                Cargo: $("#Cargo").val(),
+                IdUnidad: $("#IdUnidad").val(),
+                Login: $("#Login").val(),
+                Contraseña: $("#Contraseña").val(),
+                IdRol: IdRol,
+                Direccion: $("#Direccion").val(),
+
+                CheckPw: JSON.parse($('#ActivarPassword').is(':checked')),
+            }
+            $.ajax({
+                url: '@Url.Action("Guardar","Usuario")',
+                type: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(Obj),
+                success: function (O) {
+                    if (O.responce) {
+                        Cancelar();
+                        ListarUsuarios(1, 1);
+                        $('#exampleModal').modal('hide');
+                    }
+                    MostarInfSave(O.StatusSave);
+                }
+            });
+        }
+               function Usuarios() {
+                      var url = '@Url.Action("Usuarios", "Reportes")' + '?Tipo=PDF';
+                    window.open(url);
+                }
+    </script>
+}

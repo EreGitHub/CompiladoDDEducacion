@@ -1,0 +1,135 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="container mt-2">
+    <h4>Módulo Banco<span style="font-size:12px;color:#808080"> Dirección Departamental de Educación</span></h4>
+    <div class="card mb-3 m-1">
+        <div class="col-sm">
+            <div style="height:550px">
+                <h4 class="form-section"><i class="fa fa-users"></i> Lista Bancos Registrados</h4>                
+                <button type="button" onclick="Nuevo()" class="btn btn-outline-primary"><i class="fa fa-plus"></i><span style="margin-left:5px">Nuevo Registro</span> </button>
+                <button type="button" onclick="InformeBancos()" class="btn btn-outline-dark"><i class="fa fa-print"></i><span style="margin-left:5px">Reporte</span> </button>
+                <div class="containerCustom table-responsive mt-2">
+                    <table class='table table-hover table-sm' style='font-size:12px;'>
+                        <thead>
+                            <tr style="background-color:#17a2b8;border-color:#17a2b8;color:white">
+                                <th width='1px'>Nº</th>
+                                <th>Nombre Banco</th>
+                                <th>Nº Cuenta Banco</th>
+                                <th>Detalle</th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                            </tr>
+                        </thead>
+                        <tbody id="BancoTableHtml">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-user"></i> Banco</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="Id" value="0" />
+                <label>Nombre Banco</label>
+                <input type="text" class="form-control" placeholder="Nombre" id="NombreBanco" />
+                <label>No Cuenta Banco</label>
+                <input type="number" class="form-control" placeholder="Nº cuenta banco" id="NumCuenta" />
+                <label>Detalle</label>
+                <textarea class="form-control" id="Descripcion" style="height:80px"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="far fa-times-circle"></i> Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="Guardar()"><i class="far fa-check-circle"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script type="text/javascript">
+        ListarBanco();
+        function ListarBanco() {
+            $.getJSON('@Url.Action("All", "CuentaBanco")', null, function (O) {
+                var html = "";
+                $('#BancoTableHtml').empty();
+                O.forEach((value, i) => {
+                    html += "<tr><td>" + (i + 1) + "</td><td>" + value.NombreBanco + "</td><td>" + value.NumCuenta + "</td><td>" + value.Descripcion + "</td><td><button class='btn btn-outline-secondary btn-sm' onclick='ViewBanco(" + value.Id + ")'><i class='fa fa-pen'></i></button></td><td><button class='btn btn-outline-danger btn-sm' onclick='Eliminar(" + value.Id + ")'><i class='fa fa-trash'></i></button></td></tr>";
+                });
+                $('#BancoTableHtml').append(html);
+            });
+        }
+
+        function ViewBanco(Id) {
+            $.getJSON('@Url.Action("GetObj", "CuentaBanco")', { Id }, function (O) {
+                $('#exampleModal').modal('show');
+                $("#Id").val(O.Id);
+                $('#NumCuenta').val(O.NumCuenta)
+                $('#NombreBanco').val(O.NombreBanco);
+                $("#Descripcion").val(O.Descripcion);
+            });
+        }
+        function Nuevo() {
+            $('#exampleModal').modal('show');
+            LimpiarDatos();
+        }
+        function LimpiarDatos() {
+            $("#Id").val(0);
+            $('#NumCuenta').val("")
+            $('#NombreBanco').val('');
+            $("#Descripcion").val("");
+        }
+        function Guardar() {
+            var Obj = {
+                Id: $("#Id").val(),
+                NumCuenta: $('#NumCuenta').val(),
+                NombreBanco: $('#NombreBanco').val(),
+                Descripcion: $("#Descripcion").val()
+            };
+            $.ajax({
+                url: '@Url.Action("Guardar", "CuentaBanco")',
+                type: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(Obj),
+                success: function (O) {
+                    if (O.responce) {
+                        LimpiarDatos();
+                        ListarBanco();
+                        $('#exampleModal').modal('hide')
+                    }
+                    MostarInfSave(O.StatusSave);
+                }
+            });
+        }
+        function Eliminar(Id) {
+            $.getJSON('@Url.Action("Eliminar", "CuentaBanco")', { Id }, (O) => {
+                if (O.responce) {
+                    ListarBanco();
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+            function InformeBancos() {
+                      var url = '@Url.Action("CuentaBacos", "Reportes")' + '?Tipo=PDF';
+                    window.open(url);
+                }
+    </script>
+}
+
+

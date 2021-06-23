@@ -1,0 +1,153 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-2">
+    <h4>Módulo Tipo Producto<span style="font-size:12px;color:#808080"> Dirección Departamental de Educación</span></h4>
+    <div class="card mb-3 m-1">
+        <div class="col-sm">
+            <div style="height:550px">
+                <h4 class="form-section"><i class="fa fa-users"></i> Lista Tipos de Producto</h4>
+                <div class="row" style="margin-bottom:5px">
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="row">
+                            <div class="col-lg-10 col-md-10 col-sm-10">
+                                <div class="input-group" style="margin-bottom:5px">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa fa-search" aria-hidden="true"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="TxtParametroTipoProducto" placeholder="Buscar por Nombre..." aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2">
+                                <button type="button" onclick='ListarTipoProducto(1,1)' style="margin-right:3px" class="btn mb-1 btn-block btn-outline-primary"><i class="fa fa-search"></i> </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2">
+                        <div class="modal-footer" style="margin:0px 0 0 0;padding:0 0 0 0;border-top:none">
+                            <button type="button" onclick="TipoProducto()" class="btn btn-outline-dark btn-block"><i class="fa fa-print"></i><span style="margin-left:5px">Reporte</span> </button>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2">
+                        <div class="modal-footer" style="margin:0px 0 0 0;padding:0 0 0 0;border-top:none">
+                            <button type="button" onclick="Nuevo()" class="btn btn-outline-primary btn-block"><i class="fa fa-plus"></i><span style="margin-left:5px">Nuevo Registro</span> </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="containerCustom table-responsive">
+                    <table class='table table-hover table-sm' style='font-size:12px;'>
+                        <thead>
+                            <tr style="background-color:#17a2b8;border-color:#17a2b8;color:white">
+                                <th width='1px'>Nº</th>
+                                <th>Tipo Producto</th>
+                                <th>Descripcion</th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                            </tr>
+                        </thead>
+                        <tbody id="TipoProductoTableHtml">
+                            <tr>
+                                <td>1</td>
+                                <td>Material de Valorados-La Paz</td>
+                                <td>sin descripcion </td>
+                                <td><button class='btn btn-outline-danger btn-sm' onclick='Eliminar(" + value.Id + ")'><i class='fa fa-pen'></i></button></td>
+                                <td><button class='btn btn-outline-danger btn-sm' onclick='Eliminar(" + value.Id + ")'><i class='fa fa-trash'></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center">
+                    <ul class='pagination justify-content-end' id="TipoProductoPage"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-user"></i> Tipo Producto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="IdTipoProducto" value="0" />
+                <label>Tipo Producto</label>
+                <input type="text" class="form-control" placeholder="Nombre" id="Nombre" />
+                <label>Descripcion</label>
+                <textarea id="Descripcion" class="form-control" style="height:80px"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Cancelar()"><i class="far fa-times-circle"></i> Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="Guardar()"><i class="far fa-check-circle"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        ListarTipoProducto();
+        function ListarTipoProducto() {
+            $.getJSON('@Url.Action("All", "TipoProducto")', { SearchValue: $('#TxtParametroTipoProducto').val() }, function (O) {
+                var html = "";
+                $('#TipoProductoTableHtml').empty();
+                O.forEach((value, i) => {
+                    html += "<tr><td>" + (i + 1) + "</td><td>" + value.TipoProducto1 + "</td><td>" + value.Descripcion + "</td><td><button class='btn btn-outline-secondary btn-sm' onclick='ViewTipoProducto(" + value.Id + ")'><i class='fa fa-pen'></i></button></td><td><button class='btn btn-outline-danger btn-sm' onclick='Eliminar(" + value.Id + ")'><i class='fa fa-trash'></i></button></td></tr>";
+                });
+                $('#TipoProductoTableHtml').append(html);
+            });
+        }
+        function ViewTipoProducto(Id) {
+            $.getJSON('@Url.Action("GetObj", "TipoProducto")', { Id }, function (O) {
+                console.log(O)
+                $('#exampleModal').modal('show');
+                $("#IdTipoProducto").val(O.Id);
+                $("#Nombre").val(O.TipoProducto1);
+                $("#Descripcion").val(O.Descripcion);
+            });
+        }
+        function Nuevo() {
+            $('#exampleModal').modal('show');
+            LimpiarDatos();
+        }
+        function LimpiarDatos() {
+            $("#IdTipoProducto").val(0);
+            $("#Nombre").val("");
+            $("#Descripcion").val("");
+        }
+        function Guardar() {
+            var Obj = {
+                Id: $('#IdTipoProducto').val(),
+                TipoProducto1: $('#Nombre').val(),
+                Descripcion: $('#Descripcion').val()
+            };
+            $.getJSON('@Url.Action("Guardar", "TipoProducto")', Obj, function (O) {
+                if (O.responce) {
+                    ListarTipoProducto();
+                    $('#exampleModal').modal('hide');
+                    LimpiarDatos();
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+        function Eliminar(Id) {
+            $.getJSON('@Url.Action("Eliminar", "TipoProducto")', {Id}, function (O) {
+                if (O.responce) {
+                    ListarTipoProducto();
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+            function TipoProducto() {
+                      var url = '@Url.Action("TipoProducto", "Reportes")' + '?Tipo=PDF';
+                    window.open(url);
+                }
+    </script>
+}

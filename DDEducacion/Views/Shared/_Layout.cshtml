@@ -1,0 +1,669 @@
+﻿@using System.Security.Claims;
+@using System.Threading;
+@{
+    if (!User.Identity.IsAuthenticated)
+    {
+        Response.Redirect("~/Home/Login");
+    }
+    else
+    {
+        var identity = (ClaimsPrincipal)Thread.CurrentPrincipal;
+        var NombrePersona = identity.Claims.First(c => c.Type == "NombrePersona").Value;
+        var IdRol = identity.Claims.First(c => c.Type == "IdRol").Value;
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>@ViewBag.Title</title>
+            <link href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i" rel="stylesheet">
+            <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />
+            <link href="~/Content/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+            <link href="~/Content/fontawesome-free-5.12.1/css/all.min.css" rel="stylesheet" />
+            <link href="~/Content/css/CardCuston.css" rel="stylesheet" />
+            <link href="~/Content/css/CustomStyle.css" rel="stylesheet" />
+            <link href="~/Content/css/loader.css" rel="stylesheet" />
+            <link href="~/Content/css/Style.css" rel="stylesheet" />
+            <link href="~/Content/css/toastr.css" rel="stylesheet" />
+
+            <script src="~/Scripts/jquery-1.10.2.js"></script>
+            <script src="~/Content/js/bootstrap.min.js"></script>
+            <script src="~/Content/js/jquery.dataTables.min.js"></script>
+            <script src="~/Content/js/dataTables.bootstrap4.min.js"></script>
+            <script src="~/Content/js/jquery.toaster.js"></script>
+            <script src="~/Content/js/jquery-confirm.min.js"></script>
+            <script src="~/Content/js/toastr.js"></script>
+            <link href="~/Content/css/style2.css" rel="stylesheet" />
+            <style>
+                * {
+                    font-size: 12px;
+                }
+
+                nav.navbar {
+                    background-color: #004686;
+                    font-size: 14px;
+                }
+
+                .ColorNav {
+                    background-color: #004686;
+                    font-size: 14px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="wrapper">
+                <!-- Sidebar  -->
+                <nav id="sidebar">
+                    <div class="sidebar-header text-center">
+                        <img height="50" src="~/Content/img/logo dde.jpg" />
+                    </div>
+
+                    <ul class="list-unstyled components">
+                        <h3 class="text-center">DD Educacion</h3>
+                        @{
+                            switch (IdRol)
+                            {
+                                case "1":
+                                    <li>
+                                        <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Principal</a>
+                                        <ul class="collapse list-unstyled" id="homeSubmenu">
+                                            <li class="">
+                                                <a href="@Url.Action("Index","Compra")" class="nav-link"> Entrada-Compra</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="@Url.Action("Index","AlmacenKardex")" class="nav-link"> Ver Kardex</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="@Url.Action("Index","SalidasPedidos")" class="nav-link"> Salidas-Pedidos</a>
+                                            </li>
+                                            <li>
+                                                <a href="@Url.Action("Index","PedidosRealizados")" class="nav-link"> Pedidos-Realizados</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">General</a>
+                                        <ul class="collapse list-unstyled" id="pageSubmenu">
+                                            <li class="">
+                                                <a href="@Url.Action("Index","TipoProducto")" class="nav-link"> Tipo Producto</a>
+                                            </li>
+                                            <li>
+                                                <a href="@Url.Action("Index","Producto")" class="nav-link"> Producto</a>
+                                            </li>
+                                            <li>
+                                                <a href="@Url.Action("Index","Proveedor")" class="nav-link"> Proveedor</a>
+                                            </li>
+                                            <li>
+                                                <a href="@Url.Action("Index","Usuario")" class="nav-link"> Usuario</a>
+                                            </li>
+                                            <li>
+                                                <a href="@Url.Action("Index","Partida")" class="nav-link"> Partida</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+
+                                    <li>
+                                        <a href="#pageSubmenuReportes" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Reportes</a>
+                                        <ul class="collapse list-unstyled" id="pageSubmenuReportes">
+                                            <li class="">
+                                                <a href="#" onclick="CompraProducto()" class="nav-link"> Reporte Compra de Producto</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="PedidosProducto()" class="nav-link"> Reporte Pedidos de Producto</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="ExistenciaProducto()" class="nav-link"> Reporte de existencia de Produtos</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="TipoProducto()" class="nav-link"> Reporte Tipo Producto</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="Productos()" class="nav-link"> Reporte de Produtos</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="Proveedor()" class="nav-link"> Reporte Proveedores</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="Usuarios()" class="nav-link"> Reporte Usuarios</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="Partida()" class="nav-link"> Reporte Partida</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="InformeBancos()" class="nav-link"> Reporte Cuenta de Banco</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    break;
+                                case "2":
+                                    <li>
+                                        <a href="#homeSubmenuVentas" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Ventas</a>
+                                        <ul class="collapse list-unstyled" id="homeSubmenuVentas">
+                                            <li>
+                                                <a href="@Url.Action("Index","Venta")" class="nav-link"> Venta</a>
+                                            </li>
+                                            <li>
+                                                <a href="@Url.Action("Index","CerrarVenta")" class="nav-link"> Cerrar Venta</a>
+                                            </li>
+                                            <li>
+                                                <a href="@Url.Action("Index","CuentaBanco")" class="nav-link"> Cuenta Banco</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Principal</a>
+                                        <ul class="collapse list-unstyled" id="homeSubmenu">
+                                            <li class="">
+                                                <a href="@Url.Action("Index","SalidasPedidos")" class="nav-link"> Salidas-Pedidos</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#pageSubmenuReportes" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Reportes</a>
+                                        <ul class="collapse list-unstyled" id="pageSubmenuReportes">
+                                            <li class="">
+                                                <a href="#" onclick="ExistenciaProducto()" class="nav-link"> Reporte de existencia de Produtos</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    break;
+                                case "3":
+                                    <li>
+                                        <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Principal</a>
+                                        <ul class="collapse list-unstyled" id="homeSubmenu">
+                                            <li class="">
+                                                <a href="@Url.Action("Index","SalidasPedidos")" class="nav-link"> Salidas-Pedidos</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#pageSubmenuReportes" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Reportes</a>
+                                        <ul class="collapse list-unstyled" id="pageSubmenuReportes">
+                                            <li class="">
+                                                <a href="#" onclick="CompraProducto()" class="nav-link"> Reporte Compra de Producto</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="PedidosProducto()" class="nav-link"> Reporte Pedidos de Producto</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="ExistenciaProducto()" class="nav-link"> Reporte de existencia de Produtos</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="TipoProducto()" class="nav-link"> Reporte Tipo Producto</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="Productos()" class="nav-link"> Reporte de Produtos</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="Proveedor()" class="nav-link"> Reporte Proveedores</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="Usuarios()" class="nav-link"> Reporte Usuarios</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="Partida()" class="nav-link"> Reporte Partida</a>
+                                            </li>
+                                            <li class="">
+                                                <a href="#" onclick="InformeBancos()" class="nav-link"> Reporte Cuenta de Banco</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    break;
+                                case "4":
+                                    <li>
+                                        <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Principal</a>
+                                        <ul class="collapse list-unstyled" id="homeSubmenu">
+                                            <li class="">
+                                                <a href="@Url.Action("Index","SalidasPedidos")" class="nav-link"> Salidas-Pedidos</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+
+                                    <li>
+                                        <a href="#pageSubmenuReportes" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Reportes</a>
+                                        <ul class="collapse list-unstyled" id="pageSubmenuReportes">
+                                            <li class="">
+                                                <a href="#" onclick="ExistenciaProducto()" class="nav-link"> Reporte de existencia de Produtos</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        @*<li>
+                                <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Principal</a>
+                                <ul class="collapse list-unstyled" id="homeSubmenu">
+                                    <li class="">
+                                        <a href="@Url.Action("Index","Compra")" class="nav-link"> Entrada-Compra</a>
+                                    </li>
+                                    <li class="">
+                                        <a href="@Url.Action("Index","AlmacenKardex")" class="nav-link"> Ver Kardex</a>
+                                    </li>
+                                    <li class="">
+                                        <a href="@Url.Action("Index","SalidasPedidos")" class="nav-link"> Salidas-Pedidos</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index","PedidosRealizados")" class="nav-link"> Pedidos-Realizados</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">General</a>
+                                <ul class="collapse list-unstyled" id="pageSubmenu">
+                                    <li class="">
+                                        <a href="@Url.Action("Index","TipoProducto")" class="nav-link"> Tipo Producto</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index","Producto")" class="nav-link"> Producto</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index","Proveedor")" class="nav-link"> Proveedor</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index","Usuario")" class="nav-link"> Usuario</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index","Partida")" class="nav-link"> Partida</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#homeSubmenuVentas" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Ventas</a>
+                                <ul class="collapse list-unstyled" id="homeSubmenuVentas">
+                                    <li>
+                                        <a href="@Url.Action("Index","Venta")" class="nav-link"> Venta</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index","CerrarVenta")" class="nav-link"> Cerrar Venta</a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index","CuentaBanco")" class="nav-link"> Cuenta Banco</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#pageSubmenuReportes" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Reportes</a>
+                                <ul class="collapse list-unstyled" id="pageSubmenuReportes">
+                                    <li class="">
+                                        <a href="#" onclick="CompraProducto()" class="nav-link"> Reporte Compra de Producto</a>
+                                    </li>
+                                    <li class="">
+                                        <a href="#" onclick="PedidosProducto()" class="nav-link"> Reporte Pedidos de Producto</a>
+                                    </li>
+                                    <li class="">
+                                        <a href="#" onclick="ExistenciaProducto()" class="nav-link"> Reporte de existencia de Produtos</a>
+                                    </li>
+                                    <li class="">
+                                        <a href="#" onclick="TipoProducto()" class="nav-link"> Reporte Tipo Producto</a>
+                                    </li>
+                                    <li class="">
+                                        <a href="#" onclick="Productos()" class="nav-link"> Reporte de Produtos</a>
+                                    </li>
+                                    <li class="">
+                                        <a href="#" onclick="Proveedor()" class="nav-link"> Reporte Proveedores</a>
+                                    </li>
+                                    <li class="">
+                                        <a href="#" onclick="Usuarios()" class="nav-link"> Reporte Usuarios</a>
+                                    </li>
+                                    <li class="">
+                                        <a href="#" onclick="Partida()" class="nav-link"> Reporte Partida</a>
+                                    </li>
+                                    <li class="">
+                                        <a href="#" onclick="InformeBancos()" class="nav-link"> Reporte Cuenta de Banco</a>
+                                    </li>
+                                </ul>
+                            </li>*@
+                    </ul>
+
+                    @*<ul class="list-unstyled CTAs">
+                            <li>
+                                <a href="https://bootstrapious.com/tutorial/files/sidebar.zip" class="download">Download source</a>
+                            </li>
+                            <li>
+                                <a href="https://bootstrapious.com/p/bootstrap-sidebar" class="article">Back to article</a>
+                            </li>
+                        </ul>*@
+                </nav>
+
+                <!-- Page Content  -->
+                <div id="content">
+
+                    @*<nav class="navbar navbar-expand-lg navbar-dark">
+                            <a class="navbar-brand blanco" href="@Url.Action("Index", "Home")">DDEducacion</a>
+                            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+                            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                                <ul class="navbar-nav mr-auto">
+                                    <li class="nav-item active">
+                                        <a href="@Url.Action("Index","Home")" class="nav-link"><i class="fa fa-home" aria-hidden="true"></i> Inicio</a>
+                                    </li>
+                                    @{
+                                        switch (int.Parse(IdRol))
+                                        {
+                                            case 1:
+                                            case 2:
+                                                <li class="nav-item active">
+                                                    <a href="@Url.Action("Index","Usuario")" class="nav-link"> Usuario</a>
+                                                </li>
+                                                <li class="nav-item active">
+                                                    <a href="@Url.Action("Index","Proveedor")" class="nav-link"> Proveedor</a>
+                                                </li>
+                                                <li class="nav-item active">
+                                                    <a href="@Url.Action("Index","Partida")" class="nav-link"> Partida</a>
+                                                </li>
+
+                                                <li class="nav-item active">
+                                                    <a href="@Url.Action("Index","Compra")" class="nav-link"> Compra</a>
+                                                </li>
+                                                break;
+                                            case 3:
+                                                <li class="nav-item active">
+                                                    <a href="@Url.Action("Inicio","Formacion")" class="nav-link"><i class="fas fa-graduation-cap"></i> Formación</a>
+                                                </li>
+                                                <li class="nav-item active">
+                                                    <a href="@Url.Action("Inicio","Docente")" class="nav-link"><i class="fas fa-chalkboard-teacher"></i> Cursos Asignados</a>
+                                                </li>
+                                                break;
+                                            case 4:
+                                                <li class="nav-item active">
+                                                    <a href="@Url.Action("Inicio","Estudiante")" class="nav-link"><i class="fas fa-user-graduate"></i> Cursos Inscritos</a>
+                                                </li>
+                                                <li class="nav-item dropdown active">
+                                                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <i class="fa fa-print"></i> Reportes
+                                                    </a>
+                                                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                                        <a href="#" onclick="HistoricoProgramasCursados()" class="dropdown-item"><i class="far fa-money-bill-alt"></i> Historico Programas Cursados</a>
+                                                    </div>
+                                                </li>
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+
+                                </ul>
+                                <ul class="nav navbar-nav navbar-right">
+                                    <li class="nav-item" active>
+                                        <a class="nav-link" href="#" id="navbarDropdown" data-toggle="modal" data-target="#ModalUsuario" role="button">
+                                            <i class="fa fa-user-circle-o" aria-hidden="true"></i> @NombrePersona
+                                        </a>
+                                    </li>
+                                    <li>
+                                    </li>
+                                </ul>
+                                <form class="form-inline my-2 my-lg-0" method="post" action="@Url.Action("Logout", "Home")">
+                                    <button class="btn btn-outline-light my-2 my-sm-0" type="submit"><i class="fa fa-sign-out" aria-hidden="true"></i> Salir</button>
+                                </form>
+                            </div>
+                        </nav>*@
+
+                    <nav class="navbar navbar-expand-lg navbar-dark">
+                        <div class="container-fluid">
+                            <button type="button" id="sidebarCollapse" class="btn btn-outline-light">
+                                <i class="fas fa-align-left"></i>
+                                <span>Toggle Sidebar</span>
+                            </button>
+                            <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                                <i class="fas fa-align-justify"></i>
+                            </button>
+
+                            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                                <ul class="nav navbar-nav ml-auto">
+                                    <li class="nav-item" active>
+                                        <a class="nav-link" href="#" id="navbarDropdown" data-toggle="modal" data-target="#ModalUsuario" role="button">
+                                            <i class="fa fa-user-circle-o" aria-hidden="true"></i> @NombrePersona
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <form class="form-inline my-2 my-lg-0" method="post" action="@Url.Action("Logout", "Home")">
+                                <button class="btn btn-outline-light my-2 my-sm-0" type="submit"><i class="fa fa-sign-out" aria-hidden="true"></i> Salir</button>
+                            </form>
+                        </div>
+                    </nav>
+
+                    @RenderBody()
+                </div>
+            </div>
+            @*<nav class="navbar navbar-expand-lg navbar-dark">
+                    <a class="navbar-brand blanco" href="@Url.Action("Index", "Home")">DDEducacion</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav mr-auto">
+                            <li class="nav-item active">
+                                <a href="@Url.Action("Index","Home")" class="nav-link"><i class="fa fa-home" aria-hidden="true"></i> Inicio</a>
+                            </li>
+                            @{
+                                switch (int.Parse(IdRol))
+                                {
+                                    case 1:
+                                    case 2:
+                                        <li class="nav-item active">
+                                            <a href="@Url.Action("Index","Usuario")" class="nav-link"> Usuario</a>
+                                        </li>
+                                        <li class="nav-item active">
+                                            <a href="@Url.Action("Index","Proveedor")" class="nav-link"> Proveedor</a>
+                                        </li>
+                                        <li class="nav-item active">
+                                            <a href="@Url.Action("Index","Partida")" class="nav-link"> Partida</a>
+                                        </li>
+                                        <li class="nav-item active">
+                                            <a href="@Url.Action("Index","Material")" class="nav-link"> Material</a>
+                                        </li>
+                                        <li class="nav-item active">
+                                            <a href="@Url.Action("Index","Compra")" class="nav-link"> Compra</a>
+                                        </li>
+                                        break;
+                                    case 3:
+                                        <li class="nav-item active">
+                                            <a href="@Url.Action("Inicio","Formacion")" class="nav-link"><i class="fas fa-graduation-cap"></i> Formación</a>
+                                        </li>
+                                        <li class="nav-item active">
+                                            <a href="@Url.Action("Inicio","Docente")" class="nav-link"><i class="fas fa-chalkboard-teacher"></i> Cursos Asignados</a>
+                                        </li>
+                                        break;
+                                    case 4:
+                                        <li class="nav-item active">
+                                            <a href="@Url.Action("Inicio","Estudiante")" class="nav-link"><i class="fas fa-user-graduate"></i> Cursos Inscritos</a>
+                                        </li>
+                                        <li class="nav-item dropdown active">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fa fa-print"></i> Reportes
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                                <a href="#" onclick="HistoricoProgramasCursados()" class="dropdown-item"><i class="far fa-money-bill-alt"></i> Historico Programas Cursados</a>
+                                            </div>
+                                        </li>
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="nav-item" active>
+                                <a class="nav-link" href="#" id="navbarDropdown" data-toggle="modal" data-target="#ModalUsuario" role="button">
+                                    <i class="fa fa-user-circle-o" aria-hidden="true"></i> @NombrePersona
+                                </a>
+                            </li>
+                            <li>
+                            </li>
+                        </ul>
+                        <form class="form-inline my-2 my-lg-0" method="post" action="@Url.Action("Logout", "Home")">
+                            <button class="btn btn-outline-light my-2 my-sm-0" type="submit"><i class="fa fa-sign-out" aria-hidden="true"></i> Salir</button>
+                        </form>
+                    </div>
+                </nav>*@
+            @*<div class="row">
+                    <div class="col-2" style="background-color:red">
+
+                    </div>
+                    <div class="col-10">
+
+                    </div>
+                </div>*@
+            <div class="modal fade" id="ModalCompraProducto" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Reporte Compra producto por fecha</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <label>Fecha Inicio</label>
+                            <input type="date" class="form-control" id="FechaIniCompraProduct" />
+                            <label>Fecha Fin</label>
+                            <input type="date" class="form-control" id="FechaFinCompraProduct" />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="far fa-times-circle"></i> Cancelar</button>
+                            <button type="button" class="btn btn-success" onclick="GenerarReportCompraProducto()"><i class="far fa-check-circle"></i> Guardar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="ModalPedidosProducto" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Reporte pedidos por fecha</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <label>Usuario</label>
+                            <select class="form-control" id="IdUsuario">
+                            </select>
+                            <label>Fecha Inicio</label>
+                            <input type="date" class="form-control" id="FechaIniPedidoProduct" />
+                            <label>Fecha Fin</label>
+                            <input type="date" class="form-control" id="FechaFinPedidoProduct" />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="far fa-times-circle"></i> Cancelar</button>
+                            <button type="button" class="btn btn-success" onclick="GenerarReportPedidosProducto()"><i class="far fa-check-circle"></i> Guardar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $("#sidebar").mCustomScrollbar({
+                        theme: "minimal"
+                    });
+
+                    $('#sidebarCollapse').on('click', function () {
+                        $('#sidebar, #content').toggleClass('active');
+                        $('.collapse.in').toggleClass('in');
+                        $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+                    });
+                });
+                function MostarInfSave(Data) {
+                    Data.forEach(value => {
+                        switch (value.Tipo) {
+                            case 'Success':
+                                toastr.success("Success", value.Nombre);
+                                break;
+                            case 'warning':
+                                toastr.warning("Warning", value.Nombre);
+                                break;
+                            case 'info':
+                                toastr.info("Info", value.Nombre);
+                                break;
+                            case 'error':
+                                toastr.error("Error", value.Nombre);
+                                break;
+                            default:
+                        }
+                    });
+                }
+                function doPaging(current, { range, pages, start = 1 }) {
+                    const paging = [];
+                    var i = Math.min(pages + start - range, Math.max(start, current - (range / 2 | 0)));
+                    const end = i + range;
+                    while (i < end) {
+                        var infStatus = i === current ? true : false;
+                        paging.push({ Page: i++, Status: infStatus });
+                    };
+                    return paging;
+                };
+                function InformeBancos() {
+                      var url = '@Url.Action("CuentaBacos", "Reportes")' + '?Tipo=PDF';
+                    window.open(url);
+                }
+                function Partida() {
+                      var url = '@Url.Action("Partida", "Reportes")' + '?Tipo=PDF';
+                    window.open(url);
+                }
+                function Productos() {
+                      var url = '@Url.Action("Productos", "Reportes")' + '?Tipo=PDF';
+                    window.open(url);
+                }
+                  function Usuarios() {
+                      var url = '@Url.Action("Usuarios", "Reportes")' + '?Tipo=PDF';
+                    window.open(url);
+                }
+                function Proveedor() {
+                      var url = '@Url.Action("Proveedor", "Reportes")' + '?Tipo=PDF';
+                    window.open(url);
+                }
+                function TipoProducto() {
+                      var url = '@Url.Action("TipoProducto", "Reportes")' + '?Tipo=PDF';
+                    window.open(url);
+                }
+                function ExistenciaProducto() {
+                      var url = '@Url.Action("ExistenciaProducto", "Reportes")' + '?Tipo=PDF';
+                    window.open(url);
+                }
+                function PedidosProducto() {
+                    $('#FechaIniPedidoProduct').val("");
+                    $('#FechaFinPedidoProduct').val("");
+                    $('#IdUsuario').val(0);
+                    $('#ModalPedidosProducto').modal('show');
+                }
+                function GenerarReportPedidosProducto() {
+                    var url = '@Url.Action("PedidosProducto", "Reportes")' + '?Tipo=PDF&FechaIni=' + $('#FechaIniPedidoProduct').val() + '&FechaFin=' + $('#FechaFinPedidoProduct').val() + '&IdUsuario=' + $('#IdUsuario').val();
+                    window.open(url);
+                }
+                function CompraProducto() {
+                    $('#FechaIniCompraProduct').val("")
+                    $('#FechaFinCompraProduct').val("")
+                    $('#ModalCompraProducto').modal('show');
+                }
+                function GenerarReportCompraProducto() {
+                    var url = '@Url.Action("CompraProducto", "Reportes")' + '?Tipo=PDF&FechaIni=' + $('#FechaIniCompraProduct').val() + '&FechaFin=' + $('#FechaFinCompraProduct').val();
+                    window.open(url);
+                }
+                ListarUsuario();
+                function ListarUsuario() {
+                    $.getJSON('@Url.Action("AllUsuario", "Usuario")', null, function (O) {
+                        var html = "";
+                        $('#IdUsuario').empty();
+                        $('#IdUsuario').append("");
+                        O.forEach((value, i) => {
+                            html += "<option value='" + value.Id + "'>" + value.Nombres + " " + value.Apaterno + " " + value.Amaterno + "</option>";
+                        });
+                        $('#IdUsuario').append(html);
+                    });
+                };
+            </script>
+            @RenderSection("Scripts", required: false)
+        </body>
+    </html>
+}
+}

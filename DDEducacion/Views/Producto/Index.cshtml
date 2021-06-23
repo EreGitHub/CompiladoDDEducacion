@@ -1,0 +1,257 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-2">
+    <h4>Módulo Producto<span style="font-size:12px;color:#808080"> Dirección Departamental de Educación</span></h4>
+    <div class="card mb-3 m-1">
+        <div class="col-sm">
+            <div style="height:550px">
+                <h4 class="form-section"><i class="fa fa-users"></i> Lista de Productos</h4>
+                <div class="row" style="margin-bottom:5px">
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="row">
+                            <div class="col-lg-10 col-md-10 col-sm-10">
+                                <div class="input-group" style="margin-bottom:5px">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa fa-search" aria-hidden="true"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="TxtParametroMaterial" placeholder="Buscar por Nombre de Producto..." aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2">
+                                <button type="button" onclick='ListarProducto(1,1)' style="margin-right:3px" class="btn mb-1 btn-block btn-outline-primary"><i class="fa fa-search"></i> </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2">
+                        <div class="modal-footer" style="margin:0px 0 0 0;padding:0 0 0 0;border-top:none">
+                            <button type="button" onclick="Productos()" class="btn btn-outline-dark btn-block"><i class="fa fa-print"></i><span style="margin-left:5px">Reporte</span> </button>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2">
+                        <div class="modal-footer" style="margin:0px 0 0 0;padding:0 0 0 0;border-top:none">
+                            <button type="button" onclick="Nuevo()" class="btn btn-outline-primary btn-block"><i class="fa fa-plus"></i><span style="margin-left:5px">Nuevo Registro</span> </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="containerCustom table-responsive">
+                    <table class='table table-hover table-sm' style='font-size:12px;'>
+                        <thead>
+                            <tr style="background-color:#17a2b8;border-color:#17a2b8;color:white">
+                                <th width='1px'>Nº</th>
+                                <th>Tipo Producto</th>
+                                <th>Nombre Producto</th>
+                                <th>PrecioCompra</th>
+                                <th>PrecioVenta</th>
+                                <th>Cantidad</th>
+                                <th>Numeracion Maxima</th>
+                                <th>Numeracion Min</th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                            </tr>
+                        </thead>
+                        <tbody id="MaterialTableHtml"></tbody>
+                    </table>
+                </div>
+                <div class="text-center">
+                    <ul class='pagination justify-content-end' id="PageMaterial"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-user"></i> Producto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="IdMaterial" value="0" />
+                <label>Tipo Producto</label>
+                <select id="IdTipoProducto" onchange="DisabledCampos()" class="form-control">
+                </select>
+                <label>Partida</label>
+                <select id="IdPartida" class="form-control">
+                </select>
+                <label>Nombre</label>
+                <input type="text" class="form-control" placeholder="Nombre" id="Nombre" />
+                <label>Unidad</label>
+                <input type="text" class="form-control" placeholder="Nombre" id="Unidad" />
+                <label>Precio Compra</label>
+                <input type="number" class="form-control" placeholder="PrecioCompra" id="PrecioCompra" />
+                <label>Precio Venta</label>
+                <input type="number" class="form-control" placeholder="PrecioVenta" id="PrecioVenta" />
+                <label>Cantidad Max</label>
+                <input type="number" value="0" class="form-control" placeholder="Cantidad max" id="Cantidad" />
+                <label>Numeracion Minima</label>
+                <input type="number" value="0" class="form-control" placeholder="Numero Inicio" id="NumInicio" />
+
+                <label>Numeracion Máxima</label>
+                <input type="number" value="0" class="form-control" placeholder="Numero Fin" id="NumFin" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Cancelar()"><i class="far fa-times-circle"></i> Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="Guardar()"><i class="far fa-check-circle"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        ListarPartida();
+        ListarTipoProducto();
+        ListarProducto(1, 1);
+        function ListarTipoProducto() {
+            $.getJSON('@Url.Action("All", "TipoProducto")', null, function (O) {
+                var html = "";
+                $('#IdTipoProducto').empty();
+                //$('#IdUnIdTipoMaterialidad').append("");
+                console.log(O)
+                O.forEach((value, i) => {
+                    html += "<option value='" + value.Id + "'>" + value.TipoProducto1 + "</option>";
+                });
+                $('#IdTipoProducto').append(html);
+            });
+        }
+        function ListarPartida() {
+            $.getJSON('@Url.Action("AllPartida", "Partida")', null, function (O) {
+                var html = "";
+                $('#IdPartida').empty();
+                $('#IdPartida').append("");
+                O.forEach((value, i) => {
+                    html += "<option value='" + value.Id + "'>" + value.NumPartida + "</option>";
+                });
+                $('#IdPartida').append(html);
+            });
+        }
+        function ListarProducto(pageIndex, is) {
+            $.getJSON('@Url.Action("All", "Producto")', { SearchValue: $('#TxtParametroMaterial').val(), PageIndex: pageIndex }, function (O) {
+                var html = "";
+                $('#MaterialTableHtml').empty();
+                O.Lst.forEach((value, i) => {
+                    html += "<tr><td>" + (i + 1) + "</td><td>" + value.NombreTipoProducto + "</td><td>" + value.Nombre + "</td><td>" + value.PrecioCompra + "</td><td>" + value.PrecioVenta + "</td><td>" + value.Cantidad + "</td><td>" + value.NumInicio + "</td><td>" + value.NumFin + "</td><td><button class='btn btn-outline-secondary btn-sm' onclick='ViewMaterial(" + value.Id + ")'><i class='fa fa-pen'></i></button></td><td><button class='btn btn-outline-danger btn-sm' onclick='Eliminar(" + value.Id + ")'><i class='fa fa-trash'></i></button></td></tr>";
+                });
+                $('#MaterialTableHtml').append(html);
+                var TotalPages = parseInt(O.TotalPages);
+                var rangeMin = 4;
+                var rangeMax = parseInt(TotalPages) == 1 ? 1 : rangeMin && parseInt(TotalPages) < rangeMin ? parseInt(TotalPages) : rangeMin;
+
+                const paging = { range: rangeMax, pages: TotalPages };
+                var PageArray = doPaging(pageIndex, paging);
+                var sTatusPrev = (pageIndex <= 1) ? true : false;
+                var sTatuslast = (pageIndex >= paging.pages) ? true : false;
+                var html = "<li class='page-item first " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarProducto(1, " + TotalPages + ")'>First</a></li><li class='page-item prev  " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarProducto(" + parseInt(pageIndex - 1) + ", " + TotalPages + ")'>Prev</a></li>";
+                PageArray.forEach((value, i) => {
+                    html += value.Status
+                        ?
+                        "<li class='page-item active'><a class='page-link' href='#' onclick='ListarProducto(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>"
+                        :
+                        "<li class='page-item'><a class='page-link' href='#' onclick='ListarProducto(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>";
+                });
+                html += "<li class='page-item next " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarProducto(" + parseInt(pageIndex + 1) + ", " + TotalPages + ")'>Next</a></li><li class='page-item last " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarProducto(" + paging.pages + ", " + TotalPages + ")'>Last</a></li>";
+                $('#PageMaterial').html(html);
+            });
+        }
+
+        function ViewMaterial(IdProducto) {
+            $.getJSON('@Url.Action("GetObj", "Producto")', { IdProducto }, function (O) {
+                $('#exampleModal').modal('show');
+                $("#IdMaterial").val(O.Id);
+                $("#IdTipoProducto").val(O.IdTipoProducto);
+                $("#IdPartida").val(O.IdPartida);
+                $("#Nombre").val(O.Nombre);
+                $('#Unidad').val(O.Unidad)
+                $("#PrecioVenta").val(O.PrecioVenta);
+                $("#PrecioCompra").val(O.PrecioCompra);
+                $("#Cantidad").val(O.Cantidad);
+                $("#NumInicio").val(O.NumInicio);
+                $("#NumFin").val(O.NumFin);
+            });
+        }
+
+        function Nuevo() {
+            $('#exampleModal').modal('show');
+            LimpiarDatos();
+        }
+        function Cancelar() {
+            LimpiarDatos();
+        }
+        function LimpiarDatos() {
+            $("#IdMaterial").val(0);
+            $("#IdTipoProducto").val(0);
+            $("#IdPartida").val(0);
+            $("#Nombre").val("");
+            $('#Unidad').val("");
+            $("#PrecioVenta").val("");
+            $("#PrecioCompra").val("");
+            $("#Cantidad").val("");
+            $("#NumInicio").val("");
+            $("#NumFin").val("");
+        }
+        function DisabledCampos() {
+            if ($('#IdTipoProducto').val() == 1) {
+                $("#PrecioVenta").prop('disabled', true);
+                $("#NumInicio").prop('disabled', true);
+                $("#NumFin").prop('disabled', true);
+                $("#PrecioVenta").val(0);
+                $("#NumInicio").val(0);
+                $("#NumFin").val(0);
+            } else {
+                $("#PrecioVenta").prop('disabled', false);
+                $("#NumInicio").prop('disabled', false);
+                $("#NumFin").prop('disabled', false);
+            }
+        }
+        function Guardar() {
+            const Obj = {
+                Id: $("#IdMaterial").val(),
+                Nombre: $("#Nombre").val(),
+                Unidad: $('#Unidad').val(),
+                PrecioCompra: parseFloat($("#PrecioCompra").val()),
+                PrecioVenta: $("#PrecioVenta").val(),
+                Cantidad: $("#Cantidad").val(),
+                NumInicio: $("#NumInicio").val(),
+                NumFin: $("#NumFin").val(),
+                IdTipoProducto: $("#IdTipoProducto").val(),
+                IdPartida: $("#IdPartida").val()
+            };
+            $.ajax({
+                url: '@Url.Action("Guardar","Producto")',
+                type: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(Obj),
+                success: function (O) {
+                    if (O.responce) {
+                        Cancelar();
+                        ListarProducto(1, 1);
+                        $('#exampleModal').modal('hide');
+                    }
+                    MostarInfSave(O.StatusSave);
+                }
+            });
+        }
+        function Eliminar(Id) {
+            $.getJSON('@Url.Action("Eliminar", "Producto")', {Id}, function (O) {
+                if (O.responce) {
+                    ListarProducto(1, 1);
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+        function Productos() {
+                      var url = '@Url.Action("Productos", "Reportes")' + '?Tipo=PDF';
+                    window.open(url);
+                }
+    </script>
+}
+

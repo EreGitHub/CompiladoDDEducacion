@@ -1,0 +1,238 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-2">
+    <h4>Módulo Proveedor<span style="font-size:12px;color:#808080"> Dirección Departamental de Educación</span></h4>
+    <div class="card mb-3 m-1">
+        <div class="col-sm">
+            <div style="height:550px">
+                <h4 class="form-section"><i class="fa fa-users"></i> Lista Proveedores</h4>
+                <div class="row" style="margin-bottom:5px">
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="row">
+                            <div class="col-lg-10 col-md-10 col-sm-10">
+                                <div class="input-group" style="margin-bottom:5px">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa fa-search" aria-hidden="true"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="TxtParametroProveedor" placeholder="Buscar por Nombre..." aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2">
+                                <button type="button" onclick='ListarProveedor(1,1)' style="margin-right:3px" class="btn mb-1 btn-block btn-outline-primary"><i class="fa fa-search"></i> </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2">
+                        <div class="modal-footer" style="margin:0px 0 0 0;padding:0 0 0 0;border-top:none">
+                            <button type="button" onclick="Proveedor()" class="btn btn-outline-dark btn-block"><i class="fa fa-print"></i><span style="margin-left:5px">Reporte</span> </button>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2">
+                        <div class="modal-footer" style="margin:0px 0 0 0;padding:0 0 0 0;border-top:none">
+                            <button type="button" onclick="Nuevo()" class="btn btn-outline-primary btn-block"><i class="fa fa-plus"></i><span style="margin-left:5px">Nuevo Registro</span> </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="containerCustom table-responsive">
+                    <table class='table table-hover table-sm' style='font-size:12px;'>
+                        <thead>
+                            <tr style="background-color:#17a2b8;border-color:#17a2b8;color:white">
+                                <th width='1px'>Nº</th>
+                                <th>Nit/Ci</th>
+                                <th>Nombre</th>
+                                <th>Dirección</th>
+                                <th>Celular</th>
+                                <th>Telefono</th>
+                                <th>Email</th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                            </tr>
+                        </thead>
+                        <tbody id="ProveedorTableHtml"></tbody>
+                    </table>
+                </div>
+                <div class="text-center">
+                    <ul class='pagination justify-content-end' id="ProveedorInscriptos"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-user"></i> Proveedor</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <input type="hidden" id="IdProveedor" value="0" />
+                        <label>Nombre</label>
+                        <input type="text" disabled class="form-control" placeholder="Nombre" id="Nombre" />
+                        <label>Direccion</label>
+                        <input type="text" disabled class="form-control" placeholder="Direccion" id="Direccion" />
+                        <label>Celular</label>
+                        <input type="number" disabled class="form-control" placeholder="Celular" id="Cel" />
+                        <label>Telefono</label>
+                        <input type="number" disabled class="form-control" placeholder="Telefono" id="Telefono" />
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <label>Email</label>
+                        <input type="email" disabled class="form-control" placeholder="Email" id="Email" />
+                        <label>Web</label>
+                        <input type="text" disabled class="form-control" placeholder="Web" id="Web" />
+                        <label>Fax</label>
+                        <input type="number" disabled class="form-control" placeholder="Fax" id="Fax" />
+                        <label>Código Postal</label>
+                        <input type="number" disabled class="form-control" placeholder="CodPostal" id="CodPostal" />
+                    </div>
+                </div>
+                <label>Ci/Nit</label>
+                <input type="number" disabled class="form-control" placeholder="Ci/Nit" id="Nit" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Cancelar()"><i class="far fa-times-circle"></i> Cancelar</button>
+                <button type="button" disabled id="BtnGuardar" class="btn btn-success" onclick="Guardar()"><i class="far fa-check-circle"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        var EstadoModificar = false;
+        ListarProveedor(1, 1);
+        function ListarProveedor(pageIndex, is) {
+            $.getJSON('@Url.Action("All", "Proveedor")', { SearchValue: $('#TxtParametroProveedor').val(), PageIndex: pageIndex }, function (O) {
+                var html = "";
+                $('#ProveedorTableHtml').empty();
+                O.Lst.forEach((value, i) => {
+                    html += "<tr><td>" + (i + 1) + "</td><td>" + value.Nit + "</td><td>" + value.Nombre + "</td><td>" + value.Direccion + "</td><td>" + value.Cel + "</td><td>" + value.Telefono + "</td><td>" + value.Email + "</td><td><button class='btn btn-outline-info btn-sm' onclick='ViewProveedor(" + value.Id + ",\"" + value.Nombre + "\",\"" + value.Direccion + "\",\"" + value.Cel + "\",\"" + value.Telefono + "\",\"" + value.Email + "\",\"" + value.Web + "\",\"" + value.Fax + "\",\"" + value.CodPostal + "\",\"" + value.Nit + "\",false)'><i class='fa fa-eye'></i></button></td><td><button class='btn btn-outline-secondary btn-sm' onclick='ViewProveedor(" + value.Id + ",\"" + value.Nombre + "\",\"" + value.Direccion + "\",\"" + value.Cel + "\",\"" + value.Telefono + "\",\"" + value.Email + "\",\"" + value.Web + "\",\"" + value.Fax + "\",\"" + value.CodPostal + "\",\"" + value.Nit + "\",true)'><i class='fa fa-pen'></i></button></td><td><button class='btn btn-outline-danger btn-sm' onclick='Eliminar(" + value.Id + ")'><i class='fa fa-trash'></i></button></td></tr>";
+                });
+                $('#ProveedorTableHtml').append(html);
+                var TotalPages = parseInt(O.TotalPages);
+                var rangeMin = 4;
+                var rangeMax = parseInt(TotalPages) == 1 ? 1 : rangeMin && parseInt(TotalPages) < rangeMin ? parseInt(TotalPages) : rangeMin;
+
+                const paging = { range: rangeMax, pages: TotalPages };
+                var PageArray = doPaging(pageIndex, paging);
+                var sTatusPrev = (pageIndex <= 1) ? true : false;
+                var sTatuslast = (pageIndex >= paging.pages) ? true : false;
+                var html = "<li class='page-item first " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarProveedor(1, " + TotalPages + ")'>First</a></li><li class='page-item prev  " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarProveedor(" + parseInt(pageIndex - 1) + ", " + TotalPages + ")'>Prev</a></li>";
+                PageArray.forEach((value, i) => {
+                    html += value.Status
+                        ?
+                        "<li class='page-item active'><a class='page-link' href='#' onclick='ListarProveedor(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>"
+                        :
+                        "<li class='page-item'><a class='page-link' href='#' onclick='ListarProveedor(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>";
+                });
+                html += "<li class='page-item next " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarProveedor(" + parseInt(pageIndex + 1) + ", " + TotalPages + ")'>Next</a></li><li class='page-item last " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarProveedor(" + paging.pages + ", " + TotalPages + ")'>Last</a></li>";
+                $('#ProveedorInscriptos').html(html);
+            });
+        }
+
+        function ViewProveedor(IdProveedor, Nombre, Direccion, Cel, Telefono, Email, Web, Fax, CodPostal, Nit, _EstadoModificar) {
+            $('#exampleModal').modal('show');
+            EstadoModificar = _EstadoModificar;
+            disabledHtml();
+            $("#IdProveedor").val(IdProveedor);
+            $("#Nombre").val(Nombre);
+            $("#Direccion").val(Direccion);
+            $("#Cel").val(Cel);
+            $("#Telefono").val(Telefono);
+            $("#Email").val(Email);
+            $("#Web").val(Web);
+            $("#Fax").val(Fax);
+            $("#CodPostal").val(CodPostal);
+            $("#Nit").val(Nit);
+        }
+        function Nuevo() {
+            $('#exampleModal').modal('show');
+            EstadoModificar = true;
+            disabledHtml();
+            LimpiarDatos();
+        }
+        function Cancelar() {
+            EstadoModificar = false;
+            disabledHtml();
+            LimpiarDatos();
+        }
+        function disabledHtml() {
+            $("#Nombre").prop("disabled", !EstadoModificar);
+            $("#Direccion").prop("disabled", !EstadoModificar);
+            $("#Cel").prop("disabled", !EstadoModificar);
+            $("#Telefono").prop("disabled", !EstadoModificar);
+            $("#Email").prop("disabled", !EstadoModificar);
+            $("#Web").prop("disabled", !EstadoModificar);
+            $("#Fax").prop("disabled", !EstadoModificar);
+            $("#CodPostal").prop("disabled", !EstadoModificar);
+            $("#Nit").prop("disabled", !EstadoModificar);
+            $('#BtnGuardar').prop("disabled", !EstadoModificar);
+        }
+        function LimpiarDatos() {
+            $("#IdProveedor").val(0);
+            $("#Nombre").val("");
+            $("#Direccion").val("");
+            $("#Cel").val("");
+            $("#Telefono").val("");
+            $("#Email").val("");
+            $("#Web").val("");
+            $("#Fax").val("");
+            $("#CodPostal").val("");
+            $("#Nit").val("");
+        }
+        function Guardar() {
+            var Obj = {
+                Id: $("#IdProveedor").val(),
+                Nombre: $("#Nombre").val(),
+                Direccion: $("#Direccion").val(),
+                Cel: $("#Cel").val(),
+                Telefono: $("#Telefono").val(),
+                Email: $('#Email').val(),
+                Web: $('#Web').val(),
+                Fax: $('#Fax').val(),
+                CodPostal: $('#CodPostal').val(),
+                Nit: $("#Nit").val(),
+            };
+            $.ajax({
+                url: '@Url.Action("Guardar", "Proveedor")',
+                type: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(Obj),
+                success: function (O) {
+                    if (O.responce) {
+                        $('#exampleModal').modal('hide');
+                        Cancelar();
+                        ListarProveedor(1,1);
+                    }
+                    MostarInfSave(O.StatusSave);
+                }
+            });
+        }
+        function Eliminar(IdProveedor) {
+            $.getJSON('@Url.Action("Eliminar", "Proveedor")', { IdProveedor }, (O) => {
+                if (O.responce) {
+                    ListarProveedor(1, 1);
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+            function Proveedor() {
+                      var url = '@Url.Action("Proveedor", "Reportes")' + '?Tipo=PDF';
+                    window.open(url);
+                }
+    </script>
+}
+
+

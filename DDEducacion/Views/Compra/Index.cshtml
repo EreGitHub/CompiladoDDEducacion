@@ -1,0 +1,377 @@
+﻿    
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-2">
+    <h4>Módulo Compra<span style="font-size:12px;color:#808080"> Dirección Departamental de Educación</span></h4>
+    <div class="card mb-3 m-1">
+        <div class="col-sm">
+            <div style="height:550px">
+                <h4 class="form-section"><i class="fa fa-users"></i> Lista Compras</h4>
+                <div class="row" style="margin-bottom:5px">
+                    <div class="col-lg-10 col-md-10 col-sm-10">
+                        <div class="row">
+                            <div class="col-lg-10 col-md-10 col-sm-10">
+                                <div class="input-group" style="margin-bottom:5px">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa fa-search" aria-hidden="true"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="TxtParametroCompra" placeholder="Buscar por Material y Proveedor" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2">
+                                <button type="button" onclick='ListarCompra(1,1)' style="margin-right:3px" class="btn mb-1 btn-block btn-outline-primary"><i class="fa fa-search"></i> </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2">
+                        <div class="modal-footer" style="margin:0px 0 0 0;padding:0 0 0 0;border-top:none">
+                            <button type="button" onclick="NuevaCompra()" class="btn btn-outline-primary btn-block"><i class="fa fa-plus"></i><span style="margin-left:5px">Nuevo Registro</span> </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="containerCustom table-responsive">
+                    <table class='table table-hover table-sm' style='font-size:12px;'>
+                        <thead>
+                            <tr style="background-color:#17a2b8;border-color:#17a2b8;color:white">
+                                <th width='1px'>Cod</th>
+                                <th>Proveedor</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                            </tr>
+                        </thead>
+                        <tbody id="CompraTableHtml"></tbody>
+                    </table>
+                </div>
+                <div class="text-center">
+                    <ul class='pagination justify-content-end' id="PageCompra"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalCompra" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Compra</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="IdCompra" disabled class="form-control" />
+                <label>Codigo</label>
+                <input type="number" id="CodGeneradoTemp" disabled class="form-control" />
+                <label>Proveedor</label>
+                <select id="IdProveedor" class="form-control">
+                </select>
+                <label>Fecha</label>
+                <input type="date" id="Fecha" class="form-control" />
+                <label>Estado</label>
+                <input type="text" id="Estado" value="Pendiente" disabled class="form-control" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="far fa-times-circle"></i> Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="GuardarCompra()"><i class="far fa-check-circle"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalDetalleCompra" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Detalle Compra</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <button type="button" id="BtnAgregarProducto" class="btn btn-outline-primary" onclick="DatosProducto()" style="margin-bottom:5px"><i class="fa fa-plus"></i> Agregar Producto</button>
+                <div class="containerCustom table-responsive">
+                    <table class='table table-hover table-sm' style='font-size:12px;'>
+                        <thead>
+                            <tr style="background-color:#17a2b8;border-color:#17a2b8;color:white">
+                                <th width='1px'>Nº</th>
+                                <th>Tipo Producto</th>
+                                <th>Producto</th>
+                                <th>Cant.</th>
+                                <th>Precio Compra</th>
+                                <th>Costo</th>
+                                <th>Nº Inicio</th>
+                                <th>Nº Fin</th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                            </tr>
+                        </thead>
+                        <tbody id="DetalleCompraTableHtml">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="far fa-times-circle"></i> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalDatosProducto" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Producto Compra</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="IdDetalleCompra" value="0" />
+                <label>Producto</label>
+                <select id="IdProducto" onchange="GetTipoProducto()" class="form-control">
+                </select>
+                <label>Precio Compra</label>
+                <input type="number" class="form-control" placeholder="Precio Compra" id="PrecioCompra" />
+                <label>Cantidad</label>
+                <input type="number" class="form-control" onkeyup="CalcularNumFin()" placeholder="Cantidad" id="Cantidad" />
+                <label>Número Inicio</label>
+                <input type="number" value="0" onkeyup="CalcularNumFin()" class="form-control" placeholder="Número Inicio" id="NumIni" />
+                <label>Número Fin</label>
+                <input type="number" disabled value="0" class="form-control" placeholder="Número Fin" id="NumFin" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="far fa-times-circle"></i> Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="GuardarCompraProducto()"><i class="far fa-check-circle"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        //$(document).ready(function () {
+        //    var now = new Date();
+        //    var day = ("0" + now.getDate()).slice(-2);
+        //    var month = ("0" + (now.getMonth() + 1)).slice(-2);
+        //    var today = now.getFullYear() + "-" + (month) + "-" + (day);
+        //    $('#FechaCompra').val(today);
+        //});
+        var EstadoConfirmado = false;
+        var TipoProducto = 0;
+        ListarProducto();
+        ListarProveedor();
+        ListarCompra(1, 1);
+        function ListarProducto() {
+            $.getJSON('@Url.Action("AllProducto", "Producto")', null, function (O) {
+                var html = "";
+                $('#IdProducto').empty();
+                $('#IdProducto').append("");
+                O.forEach((value, i) => {
+                    html += "<option value='" + value.Id + "'>" + value.Nombre + "</option>";
+                });
+                $('#IdProducto').append(html);
+            });
+        }
+        function ListarProveedor() {
+            $.getJSON('@Url.Action("AllProveedor", "Proveedor")', null, function (O) {
+                var html = "";
+                $('#IdProveedor').empty();
+                $('#IdProveedor').append("");
+                O.forEach((value, i) => {
+                    html += "<option value='" + value.Id + "'>" + value.Nombre + "</option>";
+                });
+                $('#IdProveedor').append(html);
+            });
+        }
+        function ListarCompra(pageIndex, is) {
+            $.getJSON('@Url.Action("All", "Compra")', { SearchValue: $('#TxtParametroCompra').val(), PageIndex: pageIndex }, function (O) {
+                var html = "";
+                $('#CompraTableHtml').empty();
+                O.Lst.forEach((value, i) => {
+                    html += "<tr><td>" + value.Id + "</td><td>" + value.NombreProveedor + "</td><td>" + value.Fecha + "</td><td>" + value.Estado + "</td><td>" + ((value.Estado == "Pendiente") ? "<button class='btn btn-outline-dark btn-sm' onclick='Checar(" + value.Id + ")'><i class='far fa-check-circle'></i></button>" : "") + "</td><td>" + ((value.Estado == "Pendiente") ? "<button class='btn btn-outline-info btn-sm' onclick='AddProducto(" + value.Id + ")'><i class='fa fa-plus'></i></button>" : "") + "</td><td>" + ((value.Estado == "Pendiente") ? "<button class='btn btn-outline-secondary btn-sm' onclick='ViewCompra(" + value.Id + "," + value.IdProveedor + ",\"" + value.Fecha + "\",\"" + value.Estado + "\")'><i class='fa fa-pen'></i></button>" : "") + "</td><td>" + ((value.Estado == "Pendiente") ? "<button class='btn btn-outline-secondary btn-sm' onclick='EliminarCompra(" + value.Id + ")'><i class='fa fa-trash'></i></button>" : "<button class='btn btn-outline-dark btn-sm' onclick='AddProducto(" + value.Id + ",\"" + value.Estado + "\")'><i class='fa fa-eye'></i></button>") + "</td></tr>";
+                });
+                $('#CompraTableHtml').append(html);
+                var TotalPages = parseInt(O.TotalPages);
+                var rangeMin = 4;
+                var rangeMax = parseInt(TotalPages) == 1 ? 1 : rangeMin && parseInt(TotalPages) < rangeMin ? parseInt(TotalPages) : rangeMin;
+
+                const paging = { range: rangeMax, pages: TotalPages };
+                var PageArray = doPaging(pageIndex, paging);
+                var sTatusPrev = (pageIndex <= 1) ? true : false;
+                var sTatuslast = (pageIndex >= paging.pages) ? true : false;
+                var html = "<li class='page-item first " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarCompra(1, " + TotalPages + ")'>First</a></li><li class='page-item prev  " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarCompra(" + parseInt(pageIndex - 1) + ", " + TotalPages + ")'>Prev</a></li>";
+                PageArray.forEach((value, i) => {
+                    html += value.Status
+                        ?
+                        "<li class='page-item active'><a class='page-link' href='#' onclick='ListarCompra(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>"
+                        :
+                        "<li class='page-item'><a class='page-link' href='#' onclick='ListarCompra(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>";
+                });
+                html += "<li class='page-item next " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarCompra(" + parseInt(pageIndex + 1) + ", " + TotalPages + ")'>Next</a></li><li class='page-item last " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarCompra(" + paging.pages + ", " + TotalPages + ")'>Last</a></li>";
+                $('#PageCompra').html(html);
+            });
+        }
+        function Checar(IdCompra) {
+            $.getJSON('@Url.Action("ConfirmarCompra", "Compra")', { IdCompra }, function (O) {
+                if (O) {
+                    toastr.success('La compra fue confirmada exitosamente')
+                    ListarCompra(1, 1);
+                } else {
+                    toastr.error('Error intente nuevamente')
+                }
+            });
+        }
+        function ViewCompra(IdCompra, IdProveedor, Fecha, Estado) {
+            $('#ModalCompra').modal('show');
+            $("#IdCompra").val(IdCompra);
+            $("#IdProveedor").val(IdProveedor);
+            $('#Fecha').val(Fecha);
+            $('#Estado').val(Estado);
+        }
+
+        function NuevaCompra() {
+            $('#ModalCompra').modal('show');
+            LimpiarDatosCompra();
+            $.getJSON('@Url.Action("GetId", "Compra")', null, function (O) {
+                $('#CodGeneradoTemp').val(O);
+            });
+        }
+        function LimpiarDatosCompra() {
+            $("#IdCompra").val(0);
+            $("#IdProveedor").val(0);
+            $("#Fecha").val("");
+        }
+        function CalcularNumFin() {
+            if (TipoProducto != 1) {                
+                //$('#NumIni').prop('disabled', false)
+                var Sum = parseInt($('#NumIni').val()) + parseInt($('#Cantidad').val());
+                if (Sum != NaN) {
+                    Sum = Sum - 1;
+                    $('#NumFin').val(Sum);
+                }  
+            }
+            //if (O == 1) {
+            //    $('#NumIni').prop('disabled', true)
+            //    $('#NumFin').prop('disabled', true)
+            //} else {
+            //    $('#NumIni').prop('disabled', false)
+            //    //$('#NumFin').prop('disabled', false)
+            //}
+
+                                            
+        }
+        function GuardarCompra() {
+            const Obj = {
+                Id: $("#IdCompra").val(),
+                IdProveedor: $("#IdProveedor").val(),
+                FechaAdd: $('#Fecha').val(),
+            };            
+            $.getJSON('@Url.Action("Guardar", "Compra")', Obj, function (O) {
+                if (O.responce) {
+                    LimpiarDatosCompra();
+                    ListarCompra(1, 1);
+                    $('#ModalCompra').modal('hide');
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+        function EliminarCompra(Id) {
+            $.getJSON('@Url.Action("Eliminar", "Compra")', {Id}, function (O) {
+                if (O.responce) {
+                    ListarCompra(1, 1);
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+        ///compra producto
+        function DatosProducto() {
+            $('#ModalDatosProducto').modal('show');
+            LimpiarDatosDetalleCompra();
+        }
+        function AddProducto(IdCompra, Estado) {
+            EstadoConfirmado = Estado == "Confirmado" ? true : false;
+            $('#ModalDetalleCompra').modal('show');
+            if (EstadoConfirmado) {                
+                $('#BtnAgregarProducto').hide();
+            } else {
+                $('#IdCompra').val(IdCompra)
+                $('#BtnAgregarProducto').show();
+            }
+            $.getJSON('@Url.Action("All", "DetalleCompra")', { IdCompra }, function (O) {
+                var html = "";
+                $('#DetalleCompraTableHtml').empty();
+                O.forEach((value, i) => {
+                    html += "<tr><td>" + (i + 1) + "</td><td>" + value.TipoProducto + "</td><td>" + value.NombreProducto + "</td><td>" + value.Cantidad + "</td><td>" + value.PrecioCompra + "</td><td>" + (value.Cantidad*value.PrecioCompra) + " Bs.</td><td>" + value.NumIni + "</td><td>" + value.NumFin + "</td><td>" + ((EstadoConfirmado) ? "" : "<button class='btn btn-outline-secondary btn-sm' onclick='ViewDetalleCompra(" + value.Id + "," + value.IdProducto + "," + value.PrecioCompra + "," + value.Cantidad + "," + value.NumIni + "," + value.NumFin + ")'><i class='fa fa-pen'></i></button>") + "</td><td>" + ((EstadoConfirmado) ? "" : "<button class='btn btn-outline-secondary btn-sm' onclick='EliminarDetalleCompra(" + value.Id + ")'><i class='fa fa-trash'></i></button>") + "</td></tr>";
+                });
+                $('#DetalleCompraTableHtml').append(html);
+            });            
+        }
+        function ViewDetalleCompra(IdDetalleCompra, IdProducto, PrecioCompra, Cantidad, NumInicio, NumFin) {
+            $('#ModalDatosProducto').modal('show');
+            $('#IdDetalleCompra').val(IdDetalleCompra);
+            $('#IdProducto').val(IdProducto);
+            $('#PrecioCompra').val(PrecioCompra);
+            $('#Cantidad').val(Cantidad);
+            $('#NumIni').val(NumInicio);
+            $('#NumFin').val(NumFin);
+            GetTipoProducto();
+        }        
+        function GetTipoProducto() {
+            $.getJSON('@Url.Action("GetTipoProducto", "DetalleCompra")', { IdProducto: $('#IdProducto').val() }, function (O) {
+                TipoProducto = O;
+                if (O == 1) {
+                    $('#NumIni').prop('disabled', true)
+                    $('#NumFin').prop('disabled', true)
+                } else {
+                    $('#NumIni').prop('disabled', false)
+                    //$('#NumFin').prop('disabled', false)
+                }
+            });
+        }
+        function LimpiarDatosDetalleCompra() {
+            $('#IdDetalleCompra').val(0);
+            $('#IdProducto').val(0);
+            $('#PrecioCompra').val("");
+            $('#Cantidad').val("");
+            $('#NumIni').val(0);
+            $('#NumFin').val(0);
+        }
+        function GuardarCompraProducto() {
+            var Obj = {
+                Id: $('#IdDetalleCompra').val(),
+                IdCompra: $('#IdCompra').val(),
+                IdProducto: $('#IdProducto').val(),
+                PrecioCompra: $('#PrecioCompra').val(),
+                Cantidad: $('#Cantidad').val(),
+                NumIni: $('#NumIni').val(),
+                NumFin: $('#NumFin').val()
+            }
+            $.getJSON('@Url.Action("Guardar", "DetalleCompra")', Obj, function (O) {
+                if (O.responce) {
+                    $('#ModalDatosProducto').modal('hide');
+                    AddProducto($('#IdCompra').val());
+                    LimpiarDatosDetalleCompra();
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+        function EliminarDetalleCompra(Id) {
+            $.getJSON('@Url.Action("Eliminar", "DetalleCompra")', {Id}, function (O) {
+                if (O.responce) {
+                    AddProducto($('#IdCompra').val());
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+    </script>
+}
+

@@ -1,0 +1,365 @@
+﻿@using System.Security.Claims;
+@using System.Threading;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-2">
+    <h4>Módulo Salidas-Pedidos<span style="font-size:12px;color:#808080"> Dirección Departamental de Educación</span></h4>
+    <div class="card mb-3 m-1">
+        <div class="col-sm">
+            <div style="height:550px">
+                <h4 class="form-section"><i class="fa fa-users"></i> Agregar Pedido</h4>
+                <button type="button" onclick="Nuevo()" class="btn btn-outline-primary"><i class="fa fa-plus"></i><span style="margin-left:5px">Nuevo Pedido</span> </button>                
+                <h4 class="form-section"><i class="fa fa-users"></i> Detalle de Productos Solicitados</h4>
+                <div class="containerCustom table-responsive">
+                    <table class='table table-hover table-sm' style='font-size:12px;'>
+                        <thead>
+                            <tr style="background-color:#17a2b8;border-color:#17a2b8;color:white">
+                                <th width='1px'>Cod</th>
+                                <th>Solicitante</th>
+                                <th>Fecha Pedido</th>
+                                <th>Tipo Pedido</th>
+                                <th>Estado</th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                            </tr>
+                        </thead>
+                        <tbody id="PedidosTableHtml">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center">
+                    <ul class='pagination justify-content-end' id="PagePedidos"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalPedidos" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Pedido</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="IdPedido" value="0" />
+                @{
+                    var identity = (ClaimsPrincipal)Thread.CurrentPrincipal;
+                    var NombrePersona = identity.Claims.First(c => c.Type == "NombrePersona").Value;
+                    var IdRol = identity.Claims.First(c => c.Type == "IdRol").Value;
+                    <label>Solicitante</label>
+                    <input type="text" disabled class="form-control" value="@NombrePersona" />
+                    <label>Fecha Pedido</label>
+                    <input type="date" id="Fecha" class="form-control" />
+                    <label>Tipo Pedido</label>
+                    <select id="IdTipoPedido" class="form-control">
+                    </select>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="far fa-times-circle"></i> Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="GuardarPedido()"><i class="far fa-check-circle"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalDetallePedidos" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Detalle Pedido</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <button class='btn btn-outline-primary mb-2' id="BtnBuscarProducto" onclick='AddProductoPedido()'><i class='fa fa-plus'></i> Buscar Producto</button>
+                <div class="containerCustom table-responsive">
+                    <table class='table table-hover table-sm' style='font-size:12px;'>
+                        <thead>
+                            <tr style="background-color:#17a2b8;border-color:#17a2b8;color:white">
+                                <th width='1px'>Nº</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Estado</th>
+                                @*<th>Numero Inicio</th>
+                                    <th>Numero Fin</th>*@
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                            </tr>
+                        </thead>
+                        <tbody id="DetallePedidoTableHtml">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="MensageRechazo">
+                    <hr />
+                    <h5 class="text-center text-muted" id="MotivoRechazo"></h5>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="far fa-times-circle"></i> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalPedir" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Datos Pedido</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="IdDetallePedido" value="0" />
+                <label>Seleccionar Producto</label>
+                <select id="IdProducto" class="form-control">
+                </select>
+                @*al hacer click en el modal mostrar reporte de existencia de la cantidad total del producto*@
+                <label>Cantidad</label>
+                <input type="number" placeholder="Cantidad" id="Cantidad" class="form-control" />
+                @*<label>Nº Inicio</label>
+                    <input type="number" value="0" id="NumInicio" placeholder="Nº Inicio" class="form-control" />
+                    <label>Nº Fin</label>
+                    <input type="number" value="0" id="NumFin" placeholder="Nº Fin" class="form-control" />*@
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="far fa-times-circle"></i> Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="GuardarDetallePedido()"><i class="far fa-check-circle"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalMensageRechazoPedidoProducto" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Motivo Rechazo Pedido Producto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h4>Descripción Rechazo</h4>
+                <h5 class="text-center text-muted" id="MotivoRechazoPedProd"></h5>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="far fa-times-circle"></i> Cerrar</button>                
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $('#MensageRechazo').hide();
+        var EstadoRechazado = false;
+        ListarTipoPedido();
+        ListarPedidos(1,1);
+        function ListarPedidos(pageIndex, is) {
+            $.getJSON('@Url.Action("All", "SalidasPedidos")', { PageIndex: pageIndex }, function (O) {
+                var html = "";
+                console.log(O)
+                $('#PedidosTableHtml').empty();
+                O.Lst.forEach((value, i) => {
+                    html += "<tr><td>" + (i + 1) + "</td><td>" + (value.Nombres + " " + value.Apaterno + " " + value.Amaterno) + "</td><td>" + value.FechaLst + "</td><td>" + value.NombreTipoPedido + "</td><td>" + value.Estado + "</td><td>" + ((value.Estado == "Pendiente") ? "<button class='btn btn-outline-dark btn-sm' onclick='ListarProducto(" + value.Id + "," + value.IdTipoPedido + ",\"" + value.Estado + "\")'><i class='fa fa-plus'></i></button>" : "") + "</td><td>" + ((value.Estado == "Pendiente") ? "<button class='btn btn-outline-secondary btn-sm' onclick='ViewPedido(" + value.Id + "," + value.IdTipoPedido + ",\"" + value.FechaLst + "\")'><i class='fa fa-pen'></i></button>" : "") + "</td><td>" + ((value.Estado == "Pendiente") ? "<button class='btn btn-outline-danger btn-sm' onclick='EliminarPedido(" + value.Id + ")'><i class='fa fa-trash'></i></button>" : "<button class='btn btn-outline-dark btn-sm' onclick='ListarProducto(" + value.Id + "," + value.IdTipoPedido + ",\"" + value.Estado + "\")'><i class='fa fa-eye'></i></button>") + "</td></tr>";
+                });
+                $('#PedidosTableHtml').append(html);
+                var TotalPages = parseInt(O.TotalPages);
+                var rangeMin = 4;
+                var rangeMax = parseInt(TotalPages) == 1 ? 1 : rangeMin && parseInt(TotalPages) < rangeMin ? parseInt(TotalPages) : rangeMin;
+
+                const paging = { range: rangeMax, pages: TotalPages };
+                var PageArray = doPaging(pageIndex, paging);
+                var sTatusPrev = (pageIndex <= 1) ? true : false;
+                var sTatuslast = (pageIndex >= paging.pages) ? true : false;
+                var html = "<li class='page-item first " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarPedidos(1, " + TotalPages + ")'>First</a></li><li class='page-item prev  " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarPedidos(" + parseInt(pageIndex - 1) + ", " + TotalPages + ")'>Prev</a></li>";
+                PageArray.forEach((value, i) => {
+                    html += value.Status
+                        ?
+                        "<li class='page-item active'><a class='page-link' href='#' onclick='ListarPedidos(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>"
+                        :
+                        "<li class='page-item'><a class='page-link' href='#' onclick='ListarPedidos(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>";
+                });
+                html += "<li class='page-item next " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarPedidos(" + parseInt(pageIndex + 1) + ", " + TotalPages + ")'>Next</a></li><li class='page-item last " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarPedidos(" + paging.pages + ", " + TotalPages + ")'>Last</a></li>";
+                $('#PagePedidos').html(html);
+            });
+        }
+        function ViewPedido(Id, IdTipoPedido, Fecha) {
+            GetIdRolDisable();
+            $('#IdPedido').val(Id);
+            $('#IdTipoPedido').val(IdTipoPedido);
+            $('#Fecha').val(Fecha);
+            $('#ModalPedidos').modal('show');
+        }
+        function ListarTipoPedido() {
+            $.getJSON('@Url.Action("All", "TipoPedido")', null, function (O) {
+                var html = "";
+                $('#IdTipoPedido').empty();
+                $('#IdTipoPedido').append("");
+                O.forEach((value, i) => {
+                    html += "<option value='" + value.Id + "'>" + value.TipoPedido1 + "</option>";
+                });
+                $('#IdTipoPedido').append(html);
+            });
+        }
+        function Nuevo() {
+            $('#ModalPedidos').modal('show');
+            GetIdRolDisable();
+        }
+        function GetIdRolDisable() {
+            $.getJSON('@Url.Action("GetIdRolDisable", "SalidasPedidos")', null, function (O) {
+                if (O == 2) {
+                    $('#IdTipoPedido').prop('disabled', false)
+                } else {
+                    $('#IdTipoPedido').prop('disabled', true)
+                    $('#IdTipoPedido').val(2);
+                }
+            });
+        }
+        function LimpiarDatosPedido() {
+            $('#IdPedido').val(0);
+            $('#IdTipoPedido').val(1);
+            $('#Fecha').val("");
+        }
+        function GuardarPedido() {
+            var Obj = {
+                Id: $('#IdPedido').val(),
+                IdTipoPedido: $('#IdTipoPedido').val(),
+                Fecha: $('#Fecha').val(),
+            }
+            $.getJSON('@Url.Action("Guardar", "SalidasPedidos")', Obj, function (O) {
+                if (O.responce) {
+                    $('#ModalPedidos').modal('hide');
+                    LimpiarDatosPedido();
+                    ListarPedidos(1, 1);
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+        function EliminarPedido(Id) {
+            $.getJSON('@Url.Action("Eliminar", "SalidasPedidos")', { Id }, function (O) {
+                if (O.responce) {
+                    ListarPedidos(1, 1);
+                    LimpiarDatosPedido();
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+
+        //detalle pedidos
+        function ListarProducto(IdPedido, IdTipoPedido, Estado) {            
+            if (Estado == "Pendiente") {
+                $('#IdPedido').val(IdPedido);
+                $('#IdTipoPedido').val(IdTipoPedido);
+                $.getJSON('@Url.Action("AllProductoPorTipoPedido", "Producto")', { IdTipoPedido }, function (O) {
+                    var html = "";
+                    $('#IdProducto').empty();
+                    $('#IdProducto').append("");
+                    O.forEach((value, i) => {
+                        html += "<option value='" + value.Id + "'>" + value.Nombre + "</option>";
+                    });
+                    $('#IdProducto').append(html);
+                });
+                $('#MensageRechazo').hide();
+                $('#BtnBuscarProducto').show();
+                EstadoRechazado = false;
+            } else {
+                $('#BtnBuscarProducto').hide();
+                EstadoRechazado = true;
+                $('#MensageRechazo').show();
+                $.getJSON('@Url.Action("GetMotivoRechazo", "SalidasPedidos")', { IdPedido }, function (O) {
+                    $('#MotivoRechazo').html(O)
+                });
+            }
+            $('#ModalDetallePedidos').modal('show');
+            ListarDetallePedido(IdPedido);
+        }
+        function ListarDetallePedido(IdPedido) {
+            $.getJSON('@Url.Action("All", "DetallePedido")', { IdPedido }, function (O) {
+                var html = "";
+                $('#DetallePedidoTableHtml').empty();
+                console.log(O)
+                O.forEach((value, i) => {
+                    //<td>" + value.NumInicio + "</td><td>" + value.NumFin + "</td>
+                    html += "<tr><td>" + (i + 1) + "</td><td>" + value.NombreProducto + "</td><td>" + value.Cantidad + "</td><td>" + value.Estado + "</td><td>" + ((EstadoRechazado) ? "" : ((value.Estado == "Rechazado") ? "" : "<button class='btn btn-outline-secondary btn-sm' onclick='ViewDatosPedido(" + value.Id + "," + value.IdProducto + "," + value.Cantidad + "," + value.NumInicio + "," + value.NumFin + ")'><i class='fa fa-pen'></i></button>")) + "</td><td>" + ((EstadoRechazado) ? "" : ((value.Estado == "Rechazado") ? "<button class='btn btn-outline-dark btn-sm' onclick='MotivoRechazoProductoPedido(" + value.Id + ")'><i class='fa fa-eye'></i></button>" : "<button class='btn btn-outline-danger btn-sm' onclick='EliminarDetallePedido(" + value.Id + ")'><i class='fa fa-trash'></i></button>")) + "</td></tr>";
+                });
+                $('#DetallePedidoTableHtml').append(html);
+            });
+        }
+        function MotivoRechazoProductoPedido(IdDetallePedido) {
+            $.getJSON('@Url.Action("GetMotivoRechazoProductoPedido", "DetallePedido")', { IdDetallePedido }, function (O) {
+                $('#MotivoRechazoPedProd').html(O)
+                $('#ModalMensageRechazoPedidoProducto').modal('show');
+            });
+        }
+        function ViewDatosPedido(IdDetallePedido, IdProducto, Cantidad, NumInicio, NumFin) {
+            $('#ModalPedir').modal('show');
+            setTimeout(function () {
+                $('#IdDetallePedido').val(IdDetallePedido);
+                $('#IdProducto').val(IdProducto);
+                $('#Cantidad').val(Cantidad);
+                //$('#NumInicio').val(NumInicio);
+                //$('#NumFin').val(NumFin);
+            }, 300);
+            //AddProductoPedido();
+        }
+
+        function AddProductoPedido() {
+            $('#ModalPedir').modal('show');
+        //    if ($('#IdTipoPedido').val() == 2) {
+        //        $('#NumInicio').prop('disabled', true)
+        //        $('#NumFin').prop('disabled', true)
+        //    } else {
+        //        $('#NumInicio').prop('disabled', false)
+        //        $('#NumFin').prop('disabled', false)
+        //    }
+        //    LimpiarDatosDetallePedido();
+        }
+        function LimpiarDatosDetallePedido() {
+            $('#IdDetallePedido').val()
+            $('#IdProducto').val(0)
+            $('#Cantidad').val("")
+            //$('#NumInicio').val(0)
+            //$('#NumFin').val(0)
+        }
+        function GuardarDetallePedido() {
+            var Obj = {
+                Id: $('#IdDetallePedido').val(),
+                IdPedido: $('#IdPedido').val(),
+                IdProducto: $('#IdProducto').val(),
+                Cantidad: $('#Cantidad').val(),
+                //NumInicio: $('#NumInicio').val(),
+                //NumFin: $('#NumFin').val()
+            }
+            $.getJSON('@Url.Action("Guardar", "DetallePedido")', Obj, function (O) {
+                if (O.responce) {
+                    $('#ModalPedir').modal('hide');
+                    ListarDetallePedido($('#IdPedido').val());
+                    LimpiarDatosDetallePedido();
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+        function EliminarDetallePedido(Id) {
+            $.getJSON('@Url.Action("Eliminar", "DetallePedido")', { Id }, function (O) {
+                if (O.responce) {
+                    ListarDetallePedido($('#IdPedido').val());
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+    </script>
+}

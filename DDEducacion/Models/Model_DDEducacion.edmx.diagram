@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="599be3b6c31a4012bb9c6389a274d8ff" Name="Diagram1">
+        <EntityTypeShape EntityType="DDEducacionModel.Compra" Width="1.5" PointX="3" PointY="12" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.ConsumoDetalleVenta" Width="1.5" PointX="14.25" PointY="3.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.ConsumoStock" Width="1.5" PointX="9.75" PointY="3.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.CuentaBancaria" Width="1.5" PointX="7.5" PointY="8.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.DetalleCompra" Width="1.5" PointX="5.25" PointY="14.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.DetallePedido" Width="1.5" PointX="7.5" PointY="3.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.DetalleVenta" Width="1.5" PointX="12" PointY="8.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.Partida" Width="1.5" PointX="0.75" PointY="15.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.Pedido" Width="1.5" PointX="5.25" PointY="3.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.Producto" Width="1.5" PointX="3" PointY="15.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.Proveedor" Width="1.5" PointX="0.75" PointY="11.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.Rol" Width="1.5" PointX="0.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.StockAlmacen" Width="1.5" PointX="7.5" PointY="14.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.StockVentas" Width="1.5" PointX="12" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.TipoPedido" Width="1.5" PointX="3" PointY="8.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.TipoProducto" Width="1.5" PointX="0.75" PointY="18" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.Unidad" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.Usuario" Width="1.5" PointX="3" PointY="2.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DDEducacionModel.Venta" Width="1.5" PointX="9.75" PointY="8.375" IsExpanded="true" />
+        <AssociationConnector Association="DDEducacionModel.fk_Compra_DetalleCompra" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_Proveedor_Compra" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_DetalleVenta_ConsumoDetalleVenta" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_StockVentas_ConsumoDetalleVenta" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_ConsumoStock_StockPedido" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_DetallePedido_ConsumoStock" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_StockAlmacen_ConsumoStock" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_CuentaBancaria_Venta" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_DetalleCompra_StockAlmacen" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_Producto_DetalleCompra" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_Pedido_DetallePedido" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_Venta_DetalleVenta" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_Partida_Producto" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_TipoPedido_Pedido" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_Usuario_Pedido" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_TipoProducto_Producto" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_Rol_Usuario" ManuallyRouted="false" />
+        <AssociationConnector Association="DDEducacionModel.fk_Unidad_Usuario" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

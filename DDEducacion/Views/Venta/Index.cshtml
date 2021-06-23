@@ -1,0 +1,332 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-2">
+    <h4>Módulo Ventas<span style="font-size:12px;color:#808080"> Dirección Departamental de Educación</span></h4>
+    <div class="card mb-3 m-1">
+        <div class="col-sm">
+            <div style="height:550px">
+                <h4 class="form-section"><i class="fa fa-users"></i> Agregar Venta</h4>
+                <button type="button" onclick="NuevaVenta()" class="btn btn-outline-primary"><i class="fa fa-plus"></i><span style="margin-left:5px">Nueva Venta</span> </button>
+                <button type="button" onclick="Reporte()" class="btn btn-outline-dark"><i class="fa fa-print"></i><span style="margin-left:5px">Reporte por fechas</span> </button>
+                <button type="button" onclick="ReporteExistenciaProducto()" class="btn btn-outline-dark"><i class="fa fa-print"></i><span style="margin-left:5px">Existencia Producto</span> </button>
+                <h4 class="form-section"><i class="fa fa-users"></i> Detalle de Productos Solicitados</h4>
+                <div class="containerCustom table-responsive">
+                    <table class='table table-hover table-sm' style='font-size:12px;'>
+                        <thead>
+                            <tr style="background-color:#17a2b8;border-color:#17a2b8;color:white">
+                                <th width='1px'>Cod</th>
+                                <th>Vendedor</th>
+                                <th>Fecha Venta</th>
+                                <th>Estado</th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                            </tr>
+                        </thead>
+                        <tbody id="VentaTableHtml">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center">
+                    <ul class='pagination justify-content-end' id="PageCompra"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalVenta" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Venta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="IdVenta" value="0" />
+                <label>Nombre Vendedor</label>
+                <input type="text" disabled class="form-control" value="Pepe rios rojas" />
+                <label>Fecha Venta</label>
+                <input type="date" id="Fecha" class="form-control" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Cancelar()"><i class="far fa-times-circle"></i> Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="GuardarVenta()"><i class="far fa-check-circle"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalDetalleVenta" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Detalle Venta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <button class='btn btn-outline-primary mb-2' id="BtnBuscarProducto" onclick='BuscarProducto()'><i class='fa fa-plus'></i> Buscar Producto</button>
+                <div class="containerCustom table-responsive">
+                    <table class='table table-hover table-sm' style='font-size:12px;'>
+                        <thead>
+                            <tr style="background-color:#17a2b8;border-color:#17a2b8;color:white">
+                                <th width='1px'>Cod</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th width='1px'></th>
+                                <th width='1px'></th>
+                            </tr>
+                        </thead>
+                        <tbody id="DetalleVentaTableHtml">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="far fa-times-circle"></i> Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalPedir" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Datos Venta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="IdDetalleVenta" value="0" />
+                <label>Seleccionar Producto</label>
+                <select id="IdProducto" onchange="getPrecioVentaProduct()" class="form-control">
+                </select>
+                <label>Cantidad</label>
+                <input type="number" onkeyup="CalcularCosto()" id="Cantidad" placeholder="Cantidad" class="form-control" />
+                <label>Costo Venta</label>
+                <input type="number" disabled placeholder="Costo Venta" id="CostoVenta" class="form-control" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Cancelar()"><i class="far fa-times-circle"></i> Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="GuardarDetalleVenta()"><i class="far fa-check-circle"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalReporte" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Reporte Venta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label>Fecha Inicio</label>
+                <input type="date" id="FechaIniReport" class="form-control" />
+                <label>Fecha Fin</label>
+                <input type="date" id="FechaFinReport" class="form-control" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Cancelar()"><i class="far fa-times-circle"></i> Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="GenerarReporte()"><i class="fa fa-print"></i> Generar Reporte</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        var PrecioVentaProducto = 0;
+        ListarProducto();
+        ListarVentas(1,1);
+        function ListarVentas(pageIndex, is) {
+            $.getJSON('@Url.Action("All", "Venta")', { PageIndex: pageIndex }, function (O) {
+                var html = "";
+                $('#VentaTableHtml').empty();
+                O.Lst.forEach((value, i) => {
+                    html += "<tr><td>" + (i + 1) + "</td><td>" + (value.Nombres + " " + value.Apaterno + " " + value.Amaterno) + "</td><td>" + value.FechaLst + "</td><td>" + value.Estado + "</td><td>" + ((value.Estado == "Pendiente") ? "<button class='btn btn-outline-dark btn-sm' onclick='Checar(" + value.Id + ")'><i class='far fa-check-circle'></i></button>" : "") + "</td><td>" + ((value.Estado == "Confirmado") ? "" : "<button class='btn btn-outline-primary btn-sm' onclick='ViewDetalleVentaProduct(" + value.Id + ",\"" + value.Estado + "\")'><i class='fa fa-plus'></i></button>") + "</td><td>" + ((value.Estado == "Confirmado") ? "" : "<button class='btn btn-outline-secondary btn-sm' onclick='ViewVenta(" + value.Id + ",\"" + value.FechaLst + "\")'><i class='fa fa-pen'></i></button>") + "</td><td>" + ((value.Estado == "Confirmado") ? "<button class='btn btn-outline-dark btn-sm' onclick='ViewDetalleVentaProduct(" + value.Id + ",\"" + value.Estado + "\")'><i class='far fa-eye'></i></button>" : "<button class='btn btn-outline-danger btn-sm' onclick='EliminarVenta(" + value.Id + ")'><i class='fa fa-trash'></i></button>") + "</td></tr>";
+                });
+                $('#VentaTableHtml').append(html);
+                var TotalPages = parseInt(O.TotalPages);
+                var rangeMin = 4;
+                var rangeMax = parseInt(TotalPages) == 1 ? 1 : rangeMin && parseInt(TotalPages) < rangeMin ? parseInt(TotalPages) : rangeMin;
+
+                const paging = { range: rangeMax, pages: TotalPages };
+                var PageArray = doPaging(pageIndex, paging);
+                var sTatusPrev = (pageIndex <= 1) ? true : false;
+                var sTatuslast = (pageIndex >= paging.pages) ? true : false;
+                var html = "<li class='page-item first " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarVentas(1, " + TotalPages + ")'>First</a></li><li class='page-item prev  " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarVentas(" + parseInt(pageIndex - 1) + ", " + TotalPages + ")'>Prev</a></li>";
+                PageArray.forEach((value, i) => {
+                    html += value.Status
+                        ?
+                        "<li class='page-item active'><a class='page-link' href='#' onclick='ListarVentas(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>"
+                        :
+                        "<li class='page-item'><a class='page-link' href='#' onclick='ListarVentas(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>";
+                });
+                html += "<li class='page-item next " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarVentas(" + parseInt(pageIndex + 1) + ", " + TotalPages + ")'>Next</a></li><li class='page-item last " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarVentas(" + paging.pages + ", " + TotalPages + ")'>Last</a></li>";
+                $('#PagePedidos').html(html);
+            });
+        }
+        function ViewVenta(Id, Fecha) {
+            $('#IdVenta').val(Id);
+            $('#Fecha').val(Fecha);
+            $('#ModalVenta').modal('show');
+        }
+        function ViewDetalleVentaProduct(IdVenta, Estado) {
+            var EstadoConfirmado = Estado == "Confirmado" ? true : false;
+            if (EstadoConfirmado) {
+                $('#BtnBuscarProducto').hide();
+            } else {
+                $('#BtnBuscarProducto').show();
+            }
+            $('#IdVenta').val(IdVenta);
+            $('#ModalDetalleVenta').modal('show');
+            $.getJSON('@Url.Action("All", "DetalleVenta")', { IdVenta }, function (O) {
+                var html = "";
+                $('#DetalleVentaTableHtml').empty();
+                O.forEach((value, i) => {
+                    html += "<tr><td>" + (i + 1) + "</td><td>" + value.NombreProducto + "</td><td>" + value.Cantidad + "</td><td>" + ((EstadoConfirmado) ? "" : "<button class='btn btn-outline-secondary btn-sm' onclick='ViewDatosPedido(" + value.Id + "," + value.IdProducto + "," + value.Cantidad + "," + value.NumInicio + "," + value.NumFin + ")'><i class='fa fa-pen'></i></button>") + "</td><td>" + ((EstadoConfirmado) ? "" : "<button class='btn btn-outline-danger btn-sm' onclick='EliminarDetalleVenta(" + value.Id + ")'><i class='fa fa-trash'></i></button>") + "</td></tr>";
+                });
+                $('#DetalleVentaTableHtml').append(html);
+            });
+        }
+        function Checar(IdVenta) {
+            $.getJSON('@Url.Action("ConfirmarVenta", "Venta")', { IdVenta }, function (O) {
+                if (O.responce) {
+                    //$('#ModalDetalleVenta').modal('show');
+                    ListarVentas(1, 1);
+                }
+                MostarInfSave(O.StatusSave);
+                //if (O) {
+
+                //    toastr.success('La compra fue confirmada exitosamente')
+                //    ListarVentas(1, 1);
+                //} else {
+                //    toastr.error('Error intente nuevamente')
+                //}
+            });
+        }
+        function NuevaVenta() {
+            $('#ModalVenta').modal('show');
+            LimpiarDatosVenta();
+        }
+        function LimpiarDatosVenta() {
+            $('#IdVenta').val(0);
+            $('#Fecha').val("");
+        }
+        function GuardarVenta() {
+            var Obj = {
+                Id: $('#IdVenta').val(),
+                Fecha: $('#Fecha').val()
+            }
+            $.getJSON('@Url.Action("Guardar", "Venta")', Obj, function (O) {
+                if (O.responce) {
+                    $('#ModalVenta').modal('hide');
+                    LimpiarDatosVenta();
+                    ListarVentas(1, 1);
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+        function EliminarVenta(Id) {
+            $.getJSON('@Url.Action("Eliminar", "Venta")', {Id}, function (O) {
+                if (O.responce) {
+                    ListarVentas(1, 1);
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+
+
+        //detalle venta
+        function ListarProducto() {
+            $.getJSON('@Url.Action("AllProductoTipoVenta", "Producto")', null, function (O) {
+                var html = "";
+                $('#IdProducto').empty();
+                $('#IdProducto').append("");
+                O.forEach((value, i) => {
+                    html += "<option value='" + value.Id + "'>" + value.Nombre + "</option>";
+                });
+                $('#IdProducto').append(html);
+            });
+        }
+        function BuscarProducto() {
+            $('#ModalPedir').modal('show');
+            LimpiarDatosDetalleVenta();
+        }
+        function LimpiarDatosDetalleVenta() {
+            $('#IdDetalleVenta').val(0);
+            $('#IdProducto').val(0);
+            $('#Cantidad').val("");
+            $('#CostoVenta').val("");
+        }
+        function getPrecioVentaProduct() {
+            $.getJSON('@Url.Action("GetObj", "Producto")', { IdProducto: $('#IdProducto').val() }, function (O) {
+                PrecioVentaProducto = O.PrecioVenta
+            });
+        }
+        function CalcularCosto() {
+            $('#CostoVenta').val(parseInt(PrecioVentaProducto * $('#Cantidad').val()));
+        }
+        function GuardarDetalleVenta() {
+            var Obj = {
+                Id: $('#IdDetalleVenta').val(),
+                IdProducto:$('#IdProducto').val(),
+                IdVenta: $('#IdVenta').val(),
+                Cantidad: $('#Cantidad').val(),
+            }
+            $.getJSON('@Url.Action("Guardar", "DetalleVenta")', Obj, function (O) {
+                if (O.responce) {
+                    $('#ModalPedir').modal('hide');
+                    ViewDetalleVentaProduct(Obj.IdVenta);
+                    LimpiarDatosDetalleVenta();
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+        function EliminarDetalleVenta(Id) {
+            $.getJSON('@Url.Action("Eliminar", "DetalleVenta")', {Id}, function (O) {
+                if (O.responce) {
+                    ViewDetalleVentaProduct($('#IdVenta').val());
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+        function Reporte() {
+            $('#ModalReporte').modal('show')
+        }
+
+        function GenerarReporte() {
+            var url = '@Url.Action("VentaPorFechas", "Reportes")' + '?Tipo=PDF&FechaIni=' + $('#FechaIniReport').val() + '&FechaFin=' + $('#FechaFinReport').val();
+            window.open(url);
+        }
+        function ReporteExistenciaProducto() {
+            var url = '@Url.Action("ExistenciaProductoVenta", "Reportes")' + '?Tipo=PDF';
+            window.open(url);
+        }
+
+        //function AddDetallePedido() {
+        //    $('#ModalDetallePedidos').modal('show');
+        //}
+
+        //function CerrarVenta() {
+        //    $('#ModalCerrarVenta').modal('show');
+        //}
+    </script>
+}
+
+

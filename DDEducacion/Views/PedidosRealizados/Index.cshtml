@@ -1,0 +1,333 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-2">
+    <h4>Módulo Pedidos-Realizados<span style="font-size:12px;color:#808080"> Dirección Departamental de Educación</span></h4>
+    <div class="card mb-3 m-1">
+        <div class="col-sm">
+            <div style="height:550px">
+                <h4 class="form-section"><i class="fa fa-users"></i> Detalle de Productos Solicitados</h4>
+                <div class="row" style="margin-bottom:5px">
+
+                    <div class="col-lg-10 col-md-10 col-sm-10">
+                        <div class="input-group" style="margin-bottom:5px">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-search" aria-hidden="true"></i></span>
+                            </div>
+                            <input type="text" class="form-control" id="TxtParametroSolicitante" placeholder="Buscar por nombre solicitante" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2">
+                        <button type="button" onclick='ListarCompra(1,1)' style="margin-right:3px" class="btn mb-1 btn-block btn-outline-primary"><i class="fa fa-search"></i> </button>
+                    </div>
+
+                </div>
+                <div class="containerCustom table-responsive">
+                    <table class='table table-hover table-sm' style='font-size:12px;'>
+                        <thead>
+                            <tr style="background-color:#17a2b8;border-color:#17a2b8;color:white">
+                                <th width='1px'>Cod</th>
+                                <th>Solicitante</th>
+                                <th>Fecha Pedido</th>
+                                <th>Tipo Pedido</th>
+                                <th>Estado</th>
+                                <th width='1px'></th>
+                            </tr>
+                        </thead>
+                        <tbody id="PedidosRealizadosTableHtml">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center">
+                    <ul class='pagination justify-content-end' id="PagePedidosRealizados"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalDetallePedidos" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Detalle Pedido</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="IdPedido" value="0" />
+                <input type="hidden" id="IdTipoPedido" value="0" />
+                <div class="containerCustom table-responsive">
+                    <table class='table table-hover table-sm' style='font-size:12px;'>
+                        <thead>
+                            <tr style="background-color:#17a2b8;border-color:#17a2b8;color:white">
+                                <th width='1px'>Nº</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                @*<th>Nº Inicio</th>
+                                <th>Nº Fin</th>*@
+                                <th>Estado</th>
+                                <th width='1px'></th>
+                            </tr>
+                        </thead>
+                        <tbody id="DetallePedidoTableHtml">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="far fa-times-circle"></i> Cerrar Ventana</button>
+                <button type="button" id="BtnRechazarPedido" class="btn btn-danger" onclick="ModalRechazarPedido()"><i class="far fa-times-circle"></i> Rechazar Pedido</button>
+                <button type="button" id="BtnConfirmarPedido" class="btn btn-primary" onclick="ConfirmarPedido()"><i class="far fa-check-circle"></i> Confirmar Pedido</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalDatosProducto" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Datos Pedido</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="IdDetallePedido" value="0" />
+                <label>Seleccionar Producto</label>
+                <select disabled id="IdProducto" class="form-control">
+                </select>
+                <label>Cantidad</label>
+                <input type="number" placeholder="Cantidad" id="Cantidad" class="form-control" />
+                @*<label>Nº Inicio</label>
+                <input type="number" placeholder="Nº Inicio" id="NumInicio" class="form-control" />
+                <label>Nº Fin</label>
+                <input type="number" placeholder="Nº Fin" id="NumFin" class="form-control" />*@
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Cancelar()"><i class="far fa-times-circle"></i> Cancelar</button>
+                <button type="button" class="btn btn-dark" onclick="ModalRechazarProductoPedido()"><i class="far fa-check-circle"></i> Rechazar Prducto</button>
+                <button type="button" class="btn btn-success" onclick="ModificarDetallePedidoProducto()"><i class="far fa-check-circle"></i> Modificar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalRechazarPedido" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Rechazar Pedido</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label>Detalle Rechazo Pedido</label>
+                <textarea class="form-control" id="MotivoRechazoPedido" style="height:80px"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Cancelar()"><i class="far fa-times-circle"></i> Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="RechazarPedido()"><i class="far fa-check-circle"></i> Rechazar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalRechazarProductoPedido" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Rechazar Pedido</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label>Detalle Rechazo Pedido</label>
+                <textarea class="form-control" id="MotivoRechazoProductoPedido" style="height:80px"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Cancelar()"><i class="far fa-times-circle"></i> Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="RechazarProductoPedido()"><i class="far fa-check-circle"></i> Rechazar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalMotivoRechazo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Motivo Rechazo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h4>Motivo Rechazo</h4>
+                <h5 class="text-muted text-center" id="MotivoRechazoView"></h5>                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Cancelar()"><i class="far fa-times-circle"></i> Cerrar</button>                
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        var EstadoRechazadoPedido = false;
+        ListarProducto();
+        ListarPedidosRealizados(1,1);
+        function ListarPedidosRealizados(pageIndex, is) {
+           $.getJSON('@Url.Action("All", "PedidosRealizados")', { SearchValue: $('#TxtParametroSolicitante').val(), PageIndex: pageIndex }, function (O) {
+                var html = "";
+               $('#PedidosRealizadosTableHtml').empty();
+                O.Lst.forEach((value, i) => {
+                    html += "<tr><td>" + value.Id + "</td><td>" + (value.Nombres + " " + value.Apaterno + " " + value.Amaterno) + "</td><td>" + value.FechaLst + "</td><td>" + value.NombreTipoPedido + "</td><td>" + value.Estado + "</td><td>" + ((value.Estado == "Pendiente") ? "<button class='btn btn-outline-dark btn-sm' onclick='ViewDetallePedido(" + value.Id + "," + value.IdTipoPedido + ",\"" + value.Estado + "\")'><i class='far fa-eye'></i></button>" : "<button class='btn btn-outline-dark btn-sm' onclick='ViewDetallePedido(" + value.Id + "," + value.IdTipoPedido + ",\"" + value.Estado + "\")'><i class='far fa-eye'></i></button>") + "</td></tr>";
+                });
+                $('#PedidosRealizadosTableHtml').append(html);
+                var TotalPages = parseInt(O.TotalPages);
+                var rangeMin = 4;
+                var rangeMax = parseInt(TotalPages) == 1 ? 1 : rangeMin && parseInt(TotalPages) < rangeMin ? parseInt(TotalPages) : rangeMin;
+
+                const paging = { range: rangeMax, pages: TotalPages };
+                var PageArray = doPaging(pageIndex, paging);
+                var sTatusPrev = (pageIndex <= 1) ? true : false;
+                var sTatuslast = (pageIndex >= paging.pages) ? true : false;
+                var html = "<li class='page-item first " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarCompra(1, " + TotalPages + ")'>First</a></li><li class='page-item prev  " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarCompra(" + parseInt(pageIndex - 1) + ", " + TotalPages + ")'>Prev</a></li>";
+                PageArray.forEach((value, i) => {
+                    html += value.Status
+                        ?
+                        "<li class='page-item active'><a class='page-link' href='#' onclick='ListarCompra(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>"
+                        :
+                        "<li class='page-item'><a class='page-link' href='#' onclick='ListarCompra(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>";
+                });
+                html += "<li class='page-item next " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarCompra(" + parseInt(pageIndex + 1) + ", " + TotalPages + ")'>Next</a></li><li class='page-item last " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarCompra(" + paging.pages + ", " + TotalPages + ")'>Last</a></li>";
+               $('#PagePedidosRealizados').html(html);
+            });
+        }
+        function ListarProducto() {
+            $.getJSON('@Url.Action("AllProducto", "Producto")', null, function (O) {
+                var html = "";
+                $('#IdProducto').empty();
+                $('#IdProducto').append("");
+                O.forEach((value, i) => {
+                    html += "<option value='" + value.Id + "'>" + value.Nombre + "</option>";
+                });
+                $('#IdProducto').append(html);
+            });
+        }
+        function ViewDetallePedido(IdPedido, IdTipoPedido, EstadoPedidoRechazo) {            
+            EstadoRechazadoPedido = (EstadoPedidoRechazo == "Rechazado") ? true : (EstadoPedidoRechazo == "Confirmado") ? true : false;            
+            $('#IdPedido').val(IdPedido);
+            $('#IdTipoPedido').val(IdTipoPedido);
+            $('#ModalDetallePedidos').modal('show');
+            ListarDetallePedidos(IdPedido);
+            if (EstadoRechazadoPedido) {
+                $('#BtnRechazarPedido').hide()
+                $('#BtnConfirmarPedido').hide()
+            } else {
+                $('#BtnRechazarPedido').show()
+                $('#BtnConfirmarPedido').show()
+            }
+        }
+        function ConfirmarPedido() {            
+            $.getJSON('@Url.Action("ConfirmarPedido", "PedidosRealizados")', { IdPedido: $('#IdPedido').val() }, function (O) {
+                if (O.responce) {
+                    $('#ModalDetallePedidos').modal('hide');
+                    ListarPedidosRealizados(1, 1);
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+        function ListarDetallePedidos(IdPedido) {
+            $.getJSON('@Url.Action("All", "DetallePedido")', { IdPedido }, function (O) {
+                var html = "";
+                $('#DetallePedidoTableHtml').empty();
+                //<td>" + value.NumInicio + "</td><td>" + value.NumFin + "</td>
+                O.forEach((value, i) => {
+                    html += "<tr><td>" + (i + 1) + "</td><td>" + value.NombreProducto + "</td><td>" + value.Cantidad + "</td><td>" + value.Estado + "</td><td>" + ((EstadoRechazadoPedido) ? "" : "" + ((value.Estado == "Rechazado") ? "<button class='btn btn-outline-secondary btn-sm' onclick='ViewDetalleRechazo(\"" + value.MotivoRechazo + "\")'><i class='fa fa-eye'></i></button>" : "<button class='btn btn-outline-secondary btn-sm' onclick='ViewPedido(" + value.Id + "," + value.IdProducto + "," + value.Cantidad + "," + value.NumInicio + "," + value.NumFin + ")'><i class='fa fa-eye'></i></button>") +"")+"</td></tr>";
+                });
+                $('#DetallePedidoTableHtml').append(html);
+            });
+        }
+        function ViewDetalleRechazo(MotivoRechazo) {
+            $('#ModalMotivoRechazo').modal('show');
+            $('#MotivoRechazoView').html(MotivoRechazo);
+        }
+        function ViewPedido(IdDetallePedido, IdProducto, Cantidad, NumInicio, NumFin) {
+            $('#ModalDatosProducto').modal('show');
+            $('#IdDetallePedido').val(IdDetallePedido);
+            $('#IdProducto').val(IdProducto);
+            $('#Cantidad').val(Cantidad);
+            //$('#NumInicio').val(NumInicio);
+            //$('#NumFin').val(NumFin);
+            //DisabledNumIniNumFin();
+        }
+        //function DisabledNumIniNumFin() {
+        //    $('#ModalPedir').modal('show');
+        //    if ($('#IdTipoPedido').val() == 2) {
+        //        $('#NumInicio').prop('disabled', true)
+        //        $('#NumFin').prop('disabled', true)
+        //    } else {
+        //        $('#NumInicio').prop('disabled', false)
+        //        $('#NumFin').prop('disabled', false)
+        //    }
+        //}
+        function ModificarDetallePedidoProducto() {
+             var Obj = {
+                Id: $('#IdDetallePedido').val(),
+                IdPedido: $('#IdPedido').val(),
+                IdProducto: $('#IdProducto').val(),
+                Cantidad: $('#Cantidad').val(),
+                //NumInicio: $('#NumInicio').val(),
+                //NumFin: $('#NumFin').val()
+            }
+            $.getJSON('@Url.Action("Guardar", "DetallePedido")', Obj, function (O) {
+                if (O.responce) {
+                    $('#ModalDatosProducto').modal('hide');
+                    ListarDetallePedidos($('#IdPedido').val());
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+        function ModalRechazarPedido() {
+            $('#ModalRechazarPedido').modal('show');
+        }
+        function RechazarPedido() {
+            $.getJSON('@Url.Action("RechazarPedido", "PedidosRealizados")', { IdPedido: $('#IdPedido').val(), MotivoRechazo: $('#MotivoRechazoPedido').val() }, function (O) {
+                if (O) {
+                    $('#ModalDetallePedidos').modal('hide');
+                    $('#ModalRechazarPedido').modal('hide');
+                    ListarPedidosRealizados(1, 1);
+                    $('#MotivoRechazoPedido').val("")
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+        function ModalRechazarProductoPedido() {
+            $('#ModalRechazarProductoPedido').modal('show');
+        }
+        function RechazarProductoPedido() {
+            $.getJSON('@Url.Action("RechazarProductoPedido", "PedidosRealizados")', { IdDetallePedido: $('#IdDetallePedido').val(), MotivoRechazo: $('#MotivoRechazoProductoPedido').val() }, function (O) {
+                if (O) {
+                    toastr.success('Success','Producto Rechazado')
+                    $('#ModalRechazarProductoPedido').modal('hide');
+                    $('#ModalDatosProducto').modal('hide');
+                    ListarDetallePedidos($('#IdPedido').val());
+                    $('#MotivoRechazoProductoPedido').val("")
+                } else {
+                    toastr.error('Error', 'Intente nuevamente');
+                }
+            });
+        }
+    </script>
+}
+

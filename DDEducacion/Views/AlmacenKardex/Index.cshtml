@@ -1,0 +1,67 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="container mt-2">
+    <h4>Módulo Kardex Producto Almacen<span style="font-size:12px;color:#808080"> Dirección Departamental de Educación</span></h4>
+    <div class="card mb-3 m-1">
+        <div class="col-sm">
+            <div style="height:550px">
+                <h4 class="form-section"><i class="fa fa-users"></i> Buscar Producto por nombre</h4>
+                <select id="IdProducto" onchange="ListaMovimientosProducto()" class="form-control">
+                </select>
+                <button type="button" onclick="Nuevo()" class="btn btn-outline-dark btn-block mt-2"><i class="fa fa-print"></i><span style="margin-left:5px">Generar Reporte</span> </button>
+                <h4 class="form-section"><i class="fa fa-users"></i> Detalle de movimiento del producto seleccionado</h4>
+                <div class="containerCustom table-responsive">
+                    <table class='table table-hover table-sm' style='font-size:12px;'>
+                        <thead>
+                            <tr style="background-color:#17a2b8;border-color:#17a2b8;color:white">
+                                <th width='1px'>Nº</th>
+                                <th>Proveedor</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Precio Compra</th>
+                                <th>Cantidad</th>
+                                <th>Nº Inicio</th>
+                                <th>Nº Fin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="AlmacenKardexTableHtml">
+                        </tbody>
+                    </table>
+                </div>          
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        ListarProducto();
+        function ListarProducto() {
+            $.getJSON('@Url.Action("AllProducto", "Producto")', null, function (O) {
+                var html = "";
+                $('#IdProducto').empty();
+                $('#IdProducto').append("");
+                O.forEach((value, i) => {
+                    html += "<option value='" + value.Id + "'>" + value.Nombre + "</option>";
+                });
+                $('#IdProducto').append(html);
+            });
+        }
+        function ListaMovimientosProducto() {
+            $.getJSON('@Url.Action("GetMovimientoKardex", "AlmacenKardex")', { IdProducto: $('#IdProducto').val() }, function (O) {
+                var html = "";
+                $('#AlmacenKardexTableHtml').empty();
+                O.forEach((value, i) => {
+                    html += "<tr><td>" + (i + 1) + "</td><td>" + value.NombreProveedor + "</td><td>" + value.Fecha + "</td><td>" + value.Estado + "</td><td>" + value.PrecioCompra + "</td><td>" + value.Cantidad + "</td><td>" + value.NumIni + "</td><td>" + value.NumFin + "</td></tr>";
+                });
+                $('#AlmacenKardexTableHtml').append(html);
+            });
+        }  
+    </script>
+}
+

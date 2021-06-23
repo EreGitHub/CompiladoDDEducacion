@@ -1,0 +1,164 @@
+﻿@using System.Security.Claims;
+@using System.Threading;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-2">
+    <h4>Módulo Cierre de Ventas<span style="font-size:12px;color:#808080"> Dirección Departamental de Educación</span></h4>
+    <div class="card mb-3 m-1">
+        <div class="col-sm">
+            <div style="height:550px">
+                <h4 class="form-section"><i class="fa fa-users"></i> Agregar Cierre de Venta</h4>
+                <button type="button" onclick="Nuevo()" class="btn btn-outline-primary"><i class="fa fa-handshake"></i><span style="margin-left:5px">Cerrar Venta</span> </button>
+                <h4 class="form-section"><i class="fa fa-users"></i> Lista de todas las ventas cerradas</h4>
+                <div class="containerCustom table-responsive">
+                    <table class='table table-hover table-sm' style='font-size:12px;'>
+                        <thead>
+                            <tr style="background-color:#17a2b8;border-color:#17a2b8;color:white">
+                                <th width='1px'>Cod</th>
+                                <th>Vendedor</th>
+                                <th>Fecha Venta</th>
+                                <th>Nº de cuenta</th>
+                                <th>Banco</th>
+                                <th>Nº de transaccion</th>
+                                <th>Monto Total Ventas</th>
+                                <th width='1px'></th>
+                            </tr>
+                        </thead>
+                        <tbody id="VentasCerradasTableHtml">                            
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center">
+                    <ul class='pagination justify-content-end' id="PageVentasCerradas"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ModalCerrarVenta" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Cerrar Venta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label>Seleccionar Fecha Cierre Venta</label>
+                <input type="date" id="Fecha" onchange="BuscarVentas()" class="form-control" />
+                <label>Seleccionar Usuario</label>
+                @{
+                    var identity = (ClaimsPrincipal)Thread.CurrentPrincipal;
+                    var NombrePersona = identity.Claims.First(c => c.Type == "NombrePersona").Value;
+                    var IdRol = identity.Claims.First(c => c.Type == "IdRol").Value;
+                    <input type="text" id="NombrePersona" class="form-control" disabled value="@NombrePersona" />
+                }
+                <label>Seleccionar Nº de cuenta</label>
+                <select class="form-control" id="IdBanco">
+                </select>
+                <label>Numero de transaccion</label>
+                <input type="number" id="NumeroTransaccion" placeholder="Numero de transaccion" class="form-control" />
+                <label>Monto total de ventas</label>
+                <input type="text" id="MontoTotalVentas" disabled placeholder="Monto Total Ventas" class="form-control" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Cancelar()"><i class="far fa-times-circle"></i> Cancelar</button>
+                <button type="button" class="btn btn-success" id="BtnGuardar" onclick="Guardar()"><i class="far fa-check-circle"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        ListarBanco();
+        ListarVentasCerradas(1, 1);
+        function ListarVentasCerradas(pageIndex, is) {
+            $.getJSON('@Url.Action("All", "CerrarVenta")', { PageIndex: pageIndex }, function (O) {                
+                var html = "";
+                $('#VentasCerradasTableHtml').empty();
+                O.Lst.forEach((value, i) => {
+                    html += "<tr><td>" + (i + 1) + "</td><td>" + value.Nombres + " " + value.Apaterno + " " + value.Amaterno + "</td><td>" + value.FechaLst + "</td><td>" + value.NumCuenta + "</td><td>" + value.NombreBanco + "</td><td>" + value.NumeroTransaccion + "</td><td>" + value.MontoTotal + "</td><td><button class='btn btn-outline-info btn-sm' onclick='ViewVentaCerrada(\"" + value.Nombres + "\",\"" + value.Apaterno + "\",\"" + value.Amaterno + "\",\"" + value.FechaLst + "\"," + value.IdCuentaBancaria + "," + value.NumeroTransaccion + "," + value.MontoTotal + ")'><i class='fa fa-eye'></i></button></td></tr>";
+                });
+                $('#VentasCerradasTableHtml').append(html);
+                var TotalPages = parseInt(O.TotalPages);
+                var rangeMin = 4;
+                var rangeMax = parseInt(TotalPages) == 1 ? 1 : rangeMin && parseInt(TotalPages) < rangeMin ? parseInt(TotalPages) : rangeMin;
+
+                const paging = { range: rangeMax, pages: TotalPages };
+                var PageArray = doPaging(pageIndex, paging);
+                var sTatusPrev = (pageIndex <= 1) ? true : false;
+                var sTatuslast = (pageIndex >= paging.pages) ? true : false;
+                var html = "<li class='page-item first " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarVentasCerradas(1, " + TotalPages + ")'>First</a></li><li class='page-item prev  " + (sTatusPrev ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarVentasCerradas(" + parseInt(pageIndex - 1) + ", " + TotalPages + ")'>Prev</a></li>";
+                PageArray.forEach((value, i) => {
+                    html += value.Status
+                        ?
+                        "<li class='page-item active'><a class='page-link' href='#' onclick='ListarVentasCerradas(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>"
+                        :
+                        "<li class='page-item'><a class='page-link' href='#' onclick='ListarVentasCerradas(" + value.Page + ", " + TotalPages + ")'>" + value.Page + "</a></li>";
+                });
+                html += "<li class='page-item next " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarVentasCerradas(" + parseInt(pageIndex + 1) + ", " + TotalPages + ")'>Next</a></li><li class='page-item last " + (sTatuslast ? "disabled" : "") + "'><a href='#' class='page-link' onclick='ListarVentasCerradas(" + paging.pages + ", " + TotalPages + ")'>Last</a></li>";
+                $('#PageVentasCerradas').html(html);
+            });
+        }
+        function ViewVentaCerrada(Nombres, Apaterno, Amaterno, FechaLst, IdCuentaBancaria, NumeroTransaccion, MontoTotal) {
+            $('#Fecha').val(FechaLst);
+            $('#IdBanco').val(IdCuentaBancaria);
+            $('#NumeroTransaccion').val(NumeroTransaccion);
+            $('#NombrePersona').val(Nombres + " " + Apaterno + " " + Amaterno);
+            $('#MontoTotalVentas').val(MontoTotal);
+            $('#ModalCerrarVenta').modal('show');
+        }
+        function ListarBanco() {
+            $.getJSON('@Url.Action("All", "CuentaBanco")', null, function (O) {
+                var html = "";
+                $('#IdBanco').empty();
+                $('#IdBanco').append("");
+                O.forEach((value, i) => {
+                    html += "<option value='" + value.Id + "'>" + value.NumCuenta + "</option>";
+                });
+                $('#IdBanco').append(html);
+            });
+        }
+        function BuscarVentas() {
+            $.getJSON('@Url.Action("GetVentasRealizadas", "CerrarVenta")', { Fecha: $('#Fecha').val() }, function (O) {
+                if (O == -1) {
+                    $('#MontoTotalVentas').val(0)
+                    $('#BtnGuardar').prop('disabled', true);
+                    toastr.warning("No existen ventas realizadas con la fecha: " + $('#Fecha').val() + ", y el usuario: " + $('#NombrePersona').val());
+                } else {
+                    $('#BtnGuardar').prop('disabled', false);
+                    $('#MontoTotalVentas').val(O)
+                }
+            });
+        }
+        function Guardar() {
+            var Obj = {
+                Fecha: $('#Fecha').val(),
+                IdCuentaBancaria: $('#IdBanco').val(),
+                NumeroTransaccion: $('#NumeroTransaccion').val(),
+            };            
+            $.getJSON('@Url.Action("Guardar", "CerrarVenta")', Obj, function (O) {
+                if (O.responce) {
+                    $('#ModalCerrarVenta').modal('hide');
+                    ListarVentasCerradas(1, 1);
+                    LimpiarDatos();
+                }
+                MostarInfSave(O.StatusSave);
+            });
+        }
+        function LimpiarDatos() {
+            $('#Fecha').val("");
+            $('#IdBanco').val(0);
+            $('#NumeroTransaccion').val("");
+        }
+        function Nuevo() {
+            LimpiarDatos();
+            $('#ModalCerrarVenta').modal('show');
+        }
+    </script>
+}
