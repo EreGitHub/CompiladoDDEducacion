@@ -239,7 +239,7 @@
                 Id: $('#IdVenta').val(),
                 FechaLst: $('#Fecha').val()
             }
-            $.getJSON('@Url.Action("Guardar", "Venta")', Obj, function (O) {
+            $.getJSON('@Url.Action("GuardarVenta", "Venta")', Obj, function (O) {
                 if (O.responce) {
                     $('#ModalVenta').modal('hide');
                     LimpiarDatosVenta();
