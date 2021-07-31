@@ -164,7 +164,7 @@
                                         <a href="#pageSubmenuReportes" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Reportes</a>
                                         <ul class="collapse list-unstyled" id="pageSubmenuReportes">
                                             <li class="">
-                                                <a href="#" onclick="ExistenciaProducto()" class="nav-link"> Reporte de existencia de Produtos</a>
+                                                <a href="#" onclick="ExistenciaProductoVenta()" class="nav-link"> Reporte de existencia de Produtos</a>
                                             </li>
                                             <li class="">
                                                 <a href="#" onclick="KardexVenta()" class="nav-link"> Kardex Venta</a>
@@ -579,7 +579,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="far fa-times-circle"></i> Cancelar</button>
-                            <button type="button" class="btn btn-success" onclick="GenerarKardexVenta()"><i class="far fa-check-circle"></i> Guardar</button>
+                            <button type="button" class="btn btn-success" onclick="GenerarKardexVenta()"><i class="fa fa-print"></i> Generar Reporte</button>
                         </div>
                     </div>
                 </div>
@@ -655,6 +655,10 @@
                       var url = '@Url.Action("ExistenciaProducto", "Reportes")' + '?Tipo=PDF';
                     window.open(url);
                 }
+                function ExistenciaProductoVenta() {
+                      var url = '@Url.Action("ExistenciaProductoVenta", "Reportes")' + '?Tipo=PDF';
+                    window.open(url);
+                }                
                 function PedidosProducto() {
                     $('#FechaIniPedidoProduct').val("");
                     $('#FechaFinPedidoProduct').val("");
