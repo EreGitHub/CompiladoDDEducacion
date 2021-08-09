@@ -221,12 +221,14 @@
             });
         }
         function Eliminar(IdProveedor) {
-            $.getJSON('@Url.Action("Eliminar", "Proveedor")', { IdProveedor }, (O) => {
-                if (O.responce) {
-                    ListarProveedor(1, 1);
-                }
-                MostarInfSave(O.StatusSave);
-            });
+            if (confirm("La informacionse eliminara de forma permanente")) {
+                $.getJSON('@Url.Action("Eliminar", "Proveedor")', { IdProveedor }, (O) => {
+                    if (O.responce) {
+                        ListarProveedor(1, 1);
+                    }
+                    MostarInfSave(O.StatusSave);
+                });
+            }
         }
             function Proveedor() {
                       var url = '@Url.Action("Proveedor", "Reportes")' + '?Tipo=PDF';

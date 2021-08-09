@@ -10,7 +10,7 @@
     <div class="card mb-3 m-1">
         <div class="col-sm">
             <div style="height:550px">
-                <h4 class="form-section"><i class="fa fa-users"></i> Lista Bancos Registrados</h4>                
+                <h4 class="form-section"><i class="fa fa-users"></i> Lista Bancos Registrados</h4>
                 <button type="button" onclick="Nuevo()" class="btn btn-outline-primary"><i class="fa fa-plus"></i><span style="margin-left:5px">Nuevo Registro</span> </button>
                 <button type="button" onclick="InformeBancos()" class="btn btn-outline-dark"><i class="fa fa-print"></i><span style="margin-left:5px">Reporte</span> </button>
                 <div class="containerCustom table-responsive mt-2">
@@ -118,17 +118,19 @@
             });
         }
         function Eliminar(Id) {
-            $.getJSON('@Url.Action("Eliminar", "CuentaBanco")', { Id }, (O) => {
-                if (O.responce) {
-                    ListarBanco();
-                }
-                MostarInfSave(O.StatusSave);
-            });
+            if (confirm("La informacionse eliminara de forma permanente")) {
+                $.getJSON('@Url.Action("Eliminar", "CuentaBanco")', { Id }, (O) => {
+                    if (O.responce) {
+                        ListarBanco();
+                    }
+                    MostarInfSave(O.StatusSave);
+                });
+            }
         }
-            function InformeBancos() {
-                      var url = '@Url.Action("CuentaBacos", "Reportes")' + '?Tipo=PDF';
-                    window.open(url);
-                }
+        function InformeBancos() {
+            var url = '@Url.Action("CuentaBacos", "Reportes")' + '?Tipo=PDF';
+            window.open(url);
+        }
     </script>
 }
 

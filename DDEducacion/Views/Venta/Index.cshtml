@@ -249,12 +249,14 @@
             });
         }
         function EliminarVenta(Id) {
-            $.getJSON('@Url.Action("Eliminar", "Venta")', {Id}, function (O) {
-                if (O.responce) {
-                    ListarVentas(1, 1);
-                }
-                MostarInfSave(O.StatusSave);
-            });
+            if (confirm("La informacionse eliminara de forma permanente")) {
+                $.getJSON('@Url.Action("Eliminar", "Venta")', { Id }, function (O) {
+                    if (O.responce) {
+                        ListarVentas(1, 1);
+                    }
+                    MostarInfSave(O.StatusSave);
+                });
+            }
         }
 
 
@@ -305,12 +307,14 @@
             });
         }
         function EliminarDetalleVenta(Id) {
-            $.getJSON('@Url.Action("Eliminar", "DetalleVenta")', {Id}, function (O) {
-                if (O.responce) {
-                    ViewDetalleVentaProduct($('#IdVenta').val());
-                }
-                MostarInfSave(O.StatusSave);
-            });
+            if (confirm("La informacionse eliminara de forma permanente")) {
+                $.getJSON('@Url.Action("Eliminar", "DetalleVenta")', { Id }, function (O) {
+                    if (O.responce) {
+                        ViewDetalleVentaProduct($('#IdVenta').val());
+                    }
+                    MostarInfSave(O.StatusSave);
+                });
+            }
         }
         function Reporte() {
             $('#ModalReporte').modal('show')

@@ -138,12 +138,14 @@
             });
         }
         function Eliminar(Id) {
-            $.getJSON('@Url.Action("Eliminar", "TipoProducto")', {Id}, function (O) {
-                if (O.responce) {
-                    ListarTipoProducto();
-                }
-                MostarInfSave(O.StatusSave);
-            });
+            if (confirm("La informacionse eliminara de forma permanente")) {
+                $.getJSON('@Url.Action("Eliminar", "TipoProducto")', { Id }, function (O) {
+                    if (O.responce) {
+                        ListarTipoProducto();
+                    }
+                    MostarInfSave(O.StatusSave);
+                });
+            }
         }
             function TipoProducto() {
                       var url = '@Url.Action("TipoProducto", "Reportes")' + '?Tipo=PDF';

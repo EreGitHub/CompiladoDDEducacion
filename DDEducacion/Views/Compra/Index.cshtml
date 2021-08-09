@@ -285,12 +285,14 @@
             });
         }
         function EliminarCompra(Id) {
-            $.getJSON('@Url.Action("Eliminar", "Compra")', {Id}, function (O) {
-                if (O.responce) {
-                    ListarCompra(1, 1);
-                }
-                MostarInfSave(O.StatusSave);
-            });
+            if (confirm("La informacionse eliminara de forma permanente")) {
+                 $.getJSON('@Url.Action("Eliminar", "Compra")', { Id }, function (O) {
+                    if (O.responce) {
+                        ListarCompra(1, 1);
+                    }
+                    MostarInfSave(O.StatusSave);
+                });
+            }            
         }
         ///compra producto
         function DatosProducto() {
@@ -365,12 +367,14 @@
             });
         }
         function EliminarDetalleCompra(Id) {
-            $.getJSON('@Url.Action("Eliminar", "DetalleCompra")', {Id}, function (O) {
-                if (O.responce) {
-                    AddProducto($('#IdCompra').val());
-                }
-                MostarInfSave(O.StatusSave);
-            });
+            if (confirm("La informacionse eliminara de forma permanente")) { 
+                $.getJSON('@Url.Action("Eliminar", "DetalleCompra")', { Id }, function (O) {
+                    if (O.responce) {
+                        AddProducto($('#IdCompra').val());
+                    }
+                    MostarInfSave(O.StatusSave);
+                });
+            }
         }
     </script>
 }

@@ -169,12 +169,14 @@
             });
         }
         function Eliminar(IdPartida) {
-            $.getJSON('@Url.Action("Eliminar", "Partida")', { IdPartida }, (O) => {
-                if (O.responce) {
-                    ListarPartida(1, 1);
-                }
-                MostarInfSave(O.StatusSave);
-            });
+            if (confirm("La informacionse eliminara de forma permanente")) {
+                $.getJSON('@Url.Action("Eliminar", "Partida")', { IdPartida }, (O) => {
+                    if (O.responce) {
+                        ListarPartida(1, 1);
+                    }
+                    MostarInfSave(O.StatusSave);
+                });
+            }
         }
             function Partida() {
                       var url = '@Url.Action("Partida", "Reportes")' + '?Tipo=PDF';

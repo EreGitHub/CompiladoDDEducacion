@@ -276,12 +276,14 @@
             $('input[name *= NameRol]').prop('checked', false);
         }
         function Eliminar(Id) {
-            $.getJSON('@Url.Action("Eliminar", "Usuario")', {Id}, function (O) {
-                if (O.responce) {
-                    ListarUsuarios(1, 1);
-                }
-                MostarInfSave(O.StatusSave);
-            });
+            if (confirm("La informacionse eliminara de forma permanente")) {
+                $.getJSON('@Url.Action("Eliminar", "Usuario")', { Id }, function (O) {
+                    if (O.responce) {
+                        ListarUsuarios(1, 1);
+                    }
+                    MostarInfSave(O.StatusSave);
+                });
+            }
         }
         function Guardar() {
             var IdRol = 0;

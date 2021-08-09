@@ -84,7 +84,9 @@
                 <label>Nombre</label>
                 <input type="text" class="form-control" placeholder="Nombre" id="Nombre" />
                 <label>Unidad</label>
-                <input type="text" class="form-control" placeholder="Nombre" id="Unidad" />
+                <select id="Unidad" class="form-control">
+                </select>
+                @*<input type="text" class="form-control" placeholder="Nombre" id="Unidad" />*@
                 <label>Precio Compra</label>
                 <input type="number" class="form-control" placeholder="PrecioCompra" id="PrecioCompra" />
                 <label>Precio Venta</label>
@@ -107,19 +109,30 @@
 
 @section Scripts {
     <script type="text/javascript">
+        ListarUnidades();
         ListarPartida();
         ListarTipoProducto();
         ListarProducto(1, 1);
+
         function ListarTipoProducto() {
             $.getJSON('@Url.Action("All", "TipoProducto")', null, function (O) {
                 var html = "";
                 $('#IdTipoProducto').empty();
-                //$('#IdUnIdTipoMaterialidad').append("");
-                console.log(O)
                 O.forEach((value, i) => {
                     html += "<option value='" + value.Id + "'>" + value.TipoProducto1 + "</option>";
                 });
                 $('#IdTipoProducto').append(html);
+            });
+        }
+        //
+        function ListarUnidades() {
+            $.getJSON('@Url.Action("AllUnidades", "Producto")', null, function (O) {
+                var html = "";
+                $('#Unidad').empty();
+                O.forEach((value, i) => {
+                    html += "<option value='" + value + "'>" + value + "</option>";
+                });
+                $('#Unidad').append(html);
             });
         }
         function ListarPartida() {
@@ -241,17 +254,19 @@
             });
         }
         function Eliminar(Id) {
-            $.getJSON('@Url.Action("Eliminar", "Producto")', {Id}, function (O) {
-                if (O.responce) {
-                    ListarProducto(1, 1);
-                }
-                MostarInfSave(O.StatusSave);
-            });
+            if (confirm("La informacionse eliminara de forma permanente")) {
+                $.getJSON('@Url.Action("Eliminar", "Producto")', { Id }, function (O) {
+                    if (O.responce) {
+                        ListarProducto(1, 1);
+                    }
+                    MostarInfSave(O.StatusSave);
+                });
+            }
         }
         function Productos() {
-                      var url = '@Url.Action("Productos", "Reportes")' + '?Tipo=PDF';
-                    window.open(url);
-                }
+            var url = '@Url.Action("Productos", "Reportes")' + '?Tipo=PDF';
+            window.open(url);
+        }
     </script>
 }
 
